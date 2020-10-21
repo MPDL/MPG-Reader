@@ -1,0 +1,117 @@
+
+* {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+/** footer **/
+
+.footer-sticky-bottom {
+  height: 142px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -60px;
+
+  background: #F8F8F8;
+  background-position: center center;
+  background-size: cover;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  line-height: 1.571;
+  padding: 20px 0 15px;
+  text-align: center;
+}
+
+.social-links-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.social-links-footer a {
+  border: 1px solid #747474;
+  color: #747474;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  line-height: 2.222;
+  margin: 10px 8px 10px;
+  width: 40px;
+
+  border-radius: 20px;
+  -webkit-transition: all 0.3s linear 0s;
+  -moz-transition: all 0.3s linear 0s;
+  -o-transition: all 0.3s linear 0s;
+  -ms-transition: all 0.3s linear 0s;
+  transition: all 0.3s linear 0s;
+}
+
+.social-links-icon{
+  width: 14px;
+  height: 14px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  height: 60px;
+  background: #012846;
+  justify-content: center;
+  align-items: center;
+}
+
+/**svg**/
+
+svg:not(:root).svg-inline--fa {
+  overflow: visible;
+}
+
+.svg-inline--fa.fa-w-14 {
+  width: .875em;
+}
+
+.svg-inline--fa {
+  display: inline-block;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -.125em;
+}
+
+.copyright {
+  color: #848484;
+  font-size: 13px;
+  line-height: 1.615;
+  padding-top: 15px;
+  text-align: center;
+
+  font-style: normal;
+  font-variant-ligatures: normal;
+  font-variant-caps: normal;
+  font-variant-numeric: normal;
+  font-variant-east-asian: normal;
+  font-weight: 400;
+  font-stretch: normal;
+}
+
+.copyright::selection {
+  background: #dc143c;
+  color: #fff;
+}
+
+.copyright a{
+  font-size: 13px;
+  text-decoration: none;
+  color: #999999;
+}
+
+.copyright a:hover{
+  color: #dc143c;
+}
+
+* {-webkit-font-smoothing: antialiased;}
