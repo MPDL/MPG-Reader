@@ -1,28 +1,24 @@
 package de.mpg.mpdl.reader.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import de.mpg.mpdl.reader.dto.RecordDTO;
 import de.mpg.mpdl.reader.dto.RecordResponseDTO;
 import de.mpg.mpdl.reader.dto.SearchItem;
 import de.mpg.mpdl.reader.dto.SearchResponseDTO;
-import de.mpg.mpdl.reader.dto.RecordDTO;
-import de.mpg.mpdl.reader.dto.DownloadDTO;
-
-import java.util.Arrays;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Arrays;
 
 @RestController
 public class EbooksController {
@@ -34,7 +30,6 @@ public class EbooksController {
 
   @RequestMapping(value = "/search", method = RequestMethod.GET)
   public SearchResponseDTO searchEbooks(final String lookfor) {
-    
     final HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
     final HttpEntity <String> entity = new HttpEntity<String>(headers);
@@ -74,7 +69,7 @@ public class EbooksController {
     
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-      HttpEntity <String> entity = new HttpEntity<String>(headers);
+      HttpEntity <String> entity = new HttpEntity<>(headers);
       String url = "https://ebooks4-qa.mpdl.mpg.de/ebooks/api/v1/record";
       UriComponentsBuilder builder=  
         UriComponentsBuilder.fromUriString(url)

@@ -17,6 +17,7 @@ public class MvcConfig implements WebMvcConfigurer {
         super();
     }
     
+    @Override
     public void addViewControllers(final ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:/mpgReaderTerms.html");
         registry.addViewController("/mpgReaderTerms.html");

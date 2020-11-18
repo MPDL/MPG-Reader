@@ -3,18 +3,26 @@ package de.mpg.mpdl.reader.component;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
+import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.WebLog;
+import de.mpg.mpdl.reader.exception.ReaderException;
 import io.swagger.annotations.ApiOperation;
 import net.logstash.logback.marker.Markers;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +30,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -59,7 +68,23 @@ public class WebLogAspect {
         HttpServletRequest request = attributes.getRequest();
         //记录请求信息
         WebLog webLog = new WebLog();
-        Object result = joinPoint.proceed();
+        Object result;
+        try {
+            result = joinPoint.proceed();
+        } catch (Throwable ex) {
+            if (hasAnnotation(joinPoint, Transactional.class)) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            }
+            if (ex instanceof ReaderException) {
+                ReaderException readerException = (ReaderException) ex;
+                webLog.setDescription(readerException.getMessage());
+                return ResponseBuilder.buildCommon(readerException.getRetCode());
+            } else {
+                webLog.setDescription(ex.getMessage());
+                throw ex;
+            }
+        }
+
         Signature signature = joinPoint.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
@@ -120,5 +145,23 @@ public class WebLogAspect {
         } else {
             return argList;
         }
+    }
+
+    private boolean hasAnnotation(ProceedingJoinPoint point, Class clazz) throws NoSuchMethodException {
+        String methodName = point.getSignature().getName();
+        Class<?> classTarget = point.getTarget().getClass();
+        Class<?>[] par = ((MethodSignature) point.getSignature()).getParameterTypes();
+        try {
+            Method objMethod = classTarget.getMethod(methodName, par);
+            Annotation[] annotationArr = objMethod.getDeclaredAnnotations();
+            for (Annotation ann : annotationArr) {
+                if (clazz.equals(ann.annotationType())) {
+                    return true;
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            throw e;
+        }
+        return false;
     }
 }
