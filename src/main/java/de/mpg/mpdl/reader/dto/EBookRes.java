@@ -21,4 +21,6 @@ public class EBookRes extends BaseRS {
   private Double rating;
 
   private Double score;
+
+  private boolean inReadingList;
 }

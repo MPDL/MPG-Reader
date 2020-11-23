@@ -27,7 +27,7 @@ public class PageUtils {
     }
 
     public static Pageable createPageable(int page, int pageSize, Sort.Direction sort) {
-        return PageRequest.of(page, pageSize, sort);
+        return PageRequest.of(page, pageSize, sort, "createDate");
     }
 
     public static Pageable createPageable(BasePageRequest pageRequest) {

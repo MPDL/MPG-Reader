@@ -44,7 +44,7 @@ public class StatisticController {
      * Most Downloaded Books*:
      * Display the most downloaded books based on {DeviceSerialNumber}.(Load on demand)
      */
-    @GetMapping(value = "/topDownloads")
+    @PostMapping(value = "/topDownloads")
     public BaseResponseDTO<Page<EBookRes>> getByDownloads(@Validated @RequestBody BasePageRequest pageRequest) {
         Page<EBook> eBookPage = eBookService.getTopDownloadsBooks(pageRequest);
         return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookRes.class));
@@ -54,7 +54,7 @@ public class StatisticController {
      * Top Rated Books*:
      * Display the top books rated by users. (Load on demand)
      */
-    @GetMapping(value = "/topScores")
+    @PostMapping(value = "/topScores")
     public BaseResponseDTO<Page<EBookRes>> getByScores(@Validated @RequestBody BasePageRequest pageRequest) {
         Page<EBook> eBookPage = eBookService.getTopRatedBooks(pageRequest);
         return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookRes.class));
