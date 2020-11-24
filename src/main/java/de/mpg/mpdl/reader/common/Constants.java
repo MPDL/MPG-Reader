@@ -8,6 +8,8 @@ import lombok.Getter;
  * @date 2020/11/3
  */
 public class Constants {
+    public static final String HEADER_EMAIL = "X-Email";
+    public static final String HEADER_SN = "X-SN";
 
     @AllArgsConstructor
     public enum Rating {
@@ -27,5 +29,16 @@ public class Constants {
 
         @Getter
         private String name;
+    }
+
+    public enum Role {
+        /**
+         * admin
+         */
+        admin,
+        /**
+         * user
+         */
+        user
     }
 }

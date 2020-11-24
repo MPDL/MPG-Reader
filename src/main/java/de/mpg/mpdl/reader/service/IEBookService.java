@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
  * @date 2020/11/9
  */
 public interface IEBookService {
-    EBook notifyDownloads(String bookId);
+    EBook notifyDownloads(String bookId, String sn);
 
     Page<EBook> getTopDownloadsBooks(BasePageRequest pageRequest);
 

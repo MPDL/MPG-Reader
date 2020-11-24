@@ -23,12 +23,15 @@ public class EBookServiceImpl implements IEBookService {
 
     @Override
     @Transactional
-    public EBook notifyDownloads(String bookId) {
+    public EBook notifyDownloads(String bookId, String sn) {
         EBook eBook = eBookRepository.findByBookId(bookId);
         if(eBook == null){
             eBook = new EBook(bookId);
         }
-        eBook.setDownloads(eBook.getDownloads() + 1);
+        if(!eBook.getDownloadedBySn().contains(sn)) {
+            eBook.setDownloads(eBook.getDownloads() + 1);
+            eBook.getDownloadedBySn().add(sn);
+        }
         eBookRepository.save(eBook);
         return eBook;
     }

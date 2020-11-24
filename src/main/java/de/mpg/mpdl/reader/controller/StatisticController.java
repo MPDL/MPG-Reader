@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,8 +35,9 @@ public class StatisticController {
      * inform download action
      */
     @PostMapping(value = "/downloaded/{bookId}")
-    public BaseResponseDTO<EBookRes> downloadNotification(@PathVariable String bookId) {
-        EBook eBook = eBookService.notifyDownloads(bookId);
+    public BaseResponseDTO<EBookRes> downloadNotification(@RequestHeader(name = "X-SN") String sn,
+                                                          @PathVariable String bookId) {
+        EBook eBook = eBookService.notifyDownloads(bookId, sn);
         EBookRes eBookRes = BeanUtils.convertObject(eBook, EBookRes.class);
         return ResponseBuilder.buildSuccess(eBookRes);
     }

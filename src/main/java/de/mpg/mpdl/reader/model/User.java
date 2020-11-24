@@ -4,12 +4,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import java.util.List;
 
 /**
  * @author shidenghui@gmail.com
@@ -29,7 +35,10 @@ public class User extends BaseModel {
     @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "sn")
-    private String sn;
+    @ElementCollection
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @CollectionTable(joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "sn_list")
+    private List<String> snList;
 
 }

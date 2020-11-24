@@ -15,8 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author shidenghui@gmail.com
@@ -34,17 +34,17 @@ public class ReadingList extends BaseModel {
     @Column(name = "reading_list_id", updatable = false, nullable = false)
     private Long readingListId;
 
-    @Column(name = "email", unique = true)
-    private String email;
+    @Column(name = "sn", unique = true)
+    private String sn;
 
     @ElementCollection
     @LazyCollection(LazyCollectionOption.FALSE)
     @CollectionTable(joinColumns = @JoinColumn(name = "reading_list_id"))
     @Column(name = "bookIds")
-    private List<String> bookIds;
+    private Set<String> bookIds = new TreeSet<>();
 
-    public ReadingList(String email) {
-        this.email = email;
-        this.bookIds = new LinkedList<>();
+    public ReadingList(String sn) {
+        this.sn = sn;
+        this.bookIds = new TreeSet<>();
     }
 }

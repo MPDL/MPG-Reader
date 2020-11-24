@@ -10,6 +10,6 @@ import org.springframework.data.domain.Page;
  * @date 2020/11/9
  */
 public interface IReviewService {
-    Review submitReview(BookReviewRQ bookReviewRQ);
+    Review submitReview(BookReviewRQ bookReviewRQ, String sn);
     Page<Review> getReviews(String bookId, BasePageRequest page);
 }

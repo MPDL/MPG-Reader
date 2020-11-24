@@ -1,6 +1,7 @@
 package de.mpg.mpdl.reader.service.impl;
 
 import de.mpg.mpdl.reader.common.ResponseBuilder;
+import de.mpg.mpdl.reader.dto.ReadingListRemoveRQ;
 import de.mpg.mpdl.reader.exception.ReaderException;
 import de.mpg.mpdl.reader.model.ReadingList;
 import de.mpg.mpdl.reader.repository.ReadingListRepository;
@@ -21,10 +22,10 @@ public class ReadingListServiceImpl implements IReadingListService {
 
     @Override
     @Transactional
-    public ReadingList addBookingIntoReadingList(String booId, String email) {
-        ReadingList readingList = readingListRepository.getByEmail(email);
+    public ReadingList addBookingIntoReadingList(String booId, String sn) {
+        ReadingList readingList = readingListRepository.getBySn(sn);
         if(readingList == null){
-            readingList = new ReadingList(email);
+            readingList = new ReadingList(sn);
         }
         readingList.getBookIds().add(booId);
         readingListRepository.save(readingList);
@@ -33,17 +34,23 @@ public class ReadingListServiceImpl implements IReadingListService {
 
     @Override
     public ReadingList getReadingByUser(String email) {
-        return readingListRepository.getByEmail(email);
+        return null;
+    }
+
+    @Override
+    public ReadingList getReadingBySn(String sn) {
+        return readingListRepository.getBySn(sn);
     }
 
     @Override
     @Transactional
-    public ReadingList removeFromReadingList(String bookId, String email) throws Exception {
-        ReadingList readingList = readingListRepository.getByEmail(email);
-        if(readingList == null || readingList.getBookIds().isEmpty() || !readingList.getBookIds().contains(bookId)){
+    public ReadingList removeFromReadingList(ReadingListRemoveRQ removeRQ, String sn) {
+        ReadingList readingList = readingListRepository.getBySn(sn);
+        if(readingList == null || readingList.getBookIds().isEmpty() ||
+                !readingList.getBookIds().containsAll(removeRQ.getBookIds())){
             throw new ReaderException(ResponseBuilder.RetCode.ERROR_400000);
         }
-        readingList.getBookIds().remove(bookId);
+        readingList.getBookIds().removeAll(removeRQ.getBookIds());
         readingListRepository.save(readingList);
         return readingList;
     }

@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ReadingListRepository extends BaseRepository<ReadingList, Long> {
-    ReadingList getByEmail(String email);
+    ReadingList getBySn(String sn);
 }

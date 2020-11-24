@@ -1,5 +1,6 @@
 package de.mpg.mpdl.reader.service;
 
+import de.mpg.mpdl.reader.dto.ReadingListRemoveRQ;
 import de.mpg.mpdl.reader.model.ReadingList;
 
 /**
@@ -8,6 +9,7 @@ import de.mpg.mpdl.reader.model.ReadingList;
  */
 public interface IReadingListService {
     ReadingList addBookingIntoReadingList(String booId, String sn);
-    ReadingList getReadingByUser(String sn);
-    ReadingList removeFromReadingList(String bookId, String sn) throws Exception;
+    ReadingList getReadingByUser(String email);
+    ReadingList getReadingBySn(String sn);
+    ReadingList removeFromReadingList(ReadingListRemoveRQ removeRQ, String sn) throws Exception;
 }

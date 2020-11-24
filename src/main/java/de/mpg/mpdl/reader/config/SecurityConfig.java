@@ -1,5 +1,6 @@
 package de.mpg.mpdl.reader.config;
 
+import de.mpg.mpdl.reader.common.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomBasicAuthenticationEntryPoint authenticationEntryPoint;
 
+    @Autowired
+    private CustomFilter customFilter;
+
     @Value("${basic.auth.client}")
     private String client;
 
@@ -42,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser(client)
                 .password(passwordEncoder().encode(secret))
-                .authorities("ROLE_USER");
+                .authorities(Constants.Role.user.toString());
     }
 
     @Override
@@ -54,7 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().csrf().disable()
-                .addFilterAfter(new CustomFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(customFilter, BasicAuthenticationFilter.class)
                 .logout().permitAll()
                 .logoutSuccessUrl("/");
     }

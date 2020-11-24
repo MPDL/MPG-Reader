@@ -27,8 +27,8 @@ public class Review extends BaseModel {
     @Column(name = "review_id", updatable = false, nullable = false)
     private Long reviewId;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "sn")
+    private String sn;
 
     @Column(name = "bookId")
     private String bookId;

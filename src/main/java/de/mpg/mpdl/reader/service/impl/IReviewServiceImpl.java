@@ -24,16 +24,17 @@ public class IReviewServiceImpl implements IReviewService {
 
     @Override
     @Transactional
-    public Review submitReview(BookReviewRQ bookReviewRQ) {
+    public Review submitReview(BookReviewRQ bookReviewRQ, String sn) {
         Review review = new Review();
         review.setBookId(bookReviewRQ.getBooId());
         review.setRating(bookReviewRQ.getRating());
         review.setComment(bookReviewRQ.getComment());
         review.setUserName(bookReviewRQ.getName());
-        review.setEmail("");
+        review.setSn(sn);
         if(bookReviewRQ.getShowOrg()) {
             //TODO how to fetch org, ldap?
-            review.setOrganization("");
+            //ou=Max Planck Digital Library,ou=MPG
+            review.setOrganization("TODO");
         }
         reviewRepository.save(review);
         return review;
