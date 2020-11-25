@@ -1,5 +1,6 @@
 package de.mpg.mpdl.reader.model;
 
+import de.mpg.mpdl.reader.common.Constants;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -52,11 +53,13 @@ public class EBook extends BaseModel {
     @Column(name = "rating")
     private Double rating = 0.00;
 
-    //weighted score by all users
-    @Column(name = "score")
-    private Double score = 0.00;
-
     public EBook(String bookId) {
         this.bookId = bookId;
+    }
+
+    public void caculateRatingAndScore(Constants.Rating newRating) {
+        int newReviewsCount = reviews + 1;
+        this.rating = (rating * reviews + newRating.getRate()) / newReviewsCount;
+        this.reviews = newReviewsCount;
     }
 }

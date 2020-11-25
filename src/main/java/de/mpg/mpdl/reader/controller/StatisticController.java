@@ -5,7 +5,7 @@ import de.mpg.mpdl.reader.common.BaseResponseDTO;
 import de.mpg.mpdl.reader.common.BeanUtils;
 import de.mpg.mpdl.reader.common.PageUtils;
 import de.mpg.mpdl.reader.common.ResponseBuilder;
-import de.mpg.mpdl.reader.dto.EBookRes;
+import de.mpg.mpdl.reader.dto.EBookStatisticRes;
 import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.service.IEBookService;
 import org.springframework.data.domain.Page;
@@ -35,11 +35,11 @@ public class StatisticController {
      * inform download action
      */
     @PostMapping(value = "/downloaded/{bookId}")
-    public BaseResponseDTO<EBookRes> downloadNotification(@RequestHeader(name = "X-SN") String sn,
-                                                          @PathVariable String bookId) {
+    public BaseResponseDTO<EBookStatisticRes> downloadNotification(@RequestHeader(name = "X-SN") String sn,
+                                                                   @PathVariable String bookId) {
         EBook eBook = eBookService.notifyDownloads(bookId, sn);
-        EBookRes eBookRes = BeanUtils.convertObject(eBook, EBookRes.class);
-        return ResponseBuilder.buildSuccess(eBookRes);
+        EBookStatisticRes eBookStatisticRes = BeanUtils.convertObject(eBook, EBookStatisticRes.class);
+        return ResponseBuilder.buildSuccess(eBookStatisticRes);
     }
 
     /**
@@ -47,9 +47,9 @@ public class StatisticController {
      * Display the most downloaded books based on {DeviceSerialNumber}.(Load on demand)
      */
     @PostMapping(value = "/topDownloads")
-    public BaseResponseDTO<Page<EBookRes>> getByDownloads(@Validated @RequestBody BasePageRequest pageRequest) {
+    public BaseResponseDTO<Page<EBookStatisticRes>> getByDownloads(@Validated @RequestBody BasePageRequest pageRequest) {
         Page<EBook> eBookPage = eBookService.getTopDownloadsBooks(pageRequest);
-        return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookRes.class));
+        return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookStatisticRes.class));
     }
 
     /**
@@ -57,9 +57,9 @@ public class StatisticController {
      * Display the top books rated by users. (Load on demand)
      */
     @PostMapping(value = "/topScores")
-    public BaseResponseDTO<Page<EBookRes>> getByScores(@Validated @RequestBody BasePageRequest pageRequest) {
+    public BaseResponseDTO<Page<EBookStatisticRes>> getByScores(@Validated @RequestBody BasePageRequest pageRequest) {
         Page<EBook> eBookPage = eBookService.getTopRatedBooks(pageRequest);
-        return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookRes.class));
+        return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookStatisticRes.class));
     }
 
     /**
@@ -68,9 +68,9 @@ public class StatisticController {
      *  The rating given by the user
      */
     @GetMapping(value = "/{bookId}")
-    public BaseResponseDTO<EBookRes> getBookStatistics(@PathVariable String bookId) {
+    public BaseResponseDTO<EBookStatisticRes> getBookStatistics(@PathVariable String bookId) {
         EBook eBook = eBookService.getByBookId(bookId);
-        EBookRes eBookRes = BeanUtils.convertObject(eBook, EBookRes.class);
-        return ResponseBuilder.buildSuccess(eBookRes);
+        EBookStatisticRes eBookStatisticRes = BeanUtils.convertObject(eBook, EBookStatisticRes.class);
+        return ResponseBuilder.buildSuccess(eBookStatisticRes);
     }
 }

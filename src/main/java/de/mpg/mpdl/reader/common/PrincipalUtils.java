@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 /**
- * @author denghui.shi@safetytaxfree.com
+ * @author shidenghui@gmail.com
  * @date 2020/11/23
  */
 public class PrincipalUtils {

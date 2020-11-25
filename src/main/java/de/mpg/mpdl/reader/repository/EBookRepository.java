@@ -15,5 +15,5 @@ public interface EBookRepository extends BaseRepository<EBook, Long> {
 
     Page<EBook> findAllByOrderByDownloads(Pageable pageable);
 
-    Page<EBook> findAllByOrderByScore(Pageable pageable);
+    Page<EBook> findAllByOrderByRating(Pageable pageable);
 }

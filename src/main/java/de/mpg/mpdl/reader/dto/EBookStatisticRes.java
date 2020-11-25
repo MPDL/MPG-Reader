@@ -11,8 +11,12 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class EBookRes extends BaseRS {
+public class EBookStatisticRes extends BaseRS {
   private String bookId;
+
+  private String bookName;
+
+  private String bookCoverURL;
 
   private int downloads;
 

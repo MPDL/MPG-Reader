@@ -1,0 +1,33 @@
+{
+  "resultCount": 1,
+  "records": [
+    {
+      "abstract": "This book focuses on yoga’s transcultural dissemination in the twentieth and twenty-first centuries. In the course of this process, the term “yoga” has been associated with various distinctive blends of mental and physical exercises performed in order to achieve some sort of improvement, whether understood in terms of esotericism, fitness, self-actualization, body aesthetics, or health care. The essays in this volume explore some of the turning points in yoga’s historico-spatial evolution and their relevance to its current appeal. The authors focus on central motivations, sites, and agents in the spread of posture-based yoga as well as on its successive (re-)interpretation and diversification, addressing questions such as: Why has yoga taken its various forms? How do time and place influence its meanings, social roles, and associated experiences? How does the transfer into new settings affect the ways in which yogic practice has been conceptualized as a system, and on what basis is it still identified as (Indian) yoga? The initial section of the volume concentrates on the re-evaluation of yoga in Indian and Western settings in the first half of the twentieth century. The following chapters link global discourses to particular local settings and explore meaning production at the micro-social level, taking Germany as the focal site. The final part of the book focuses on yoga advertising and consumption across national, social, and discursive boundaries, taking a closer look at transnational and deterritorialized yoga markets, as well as at various classes of mobile yoga practitioners",
+      "authorsSecondary": [
+        "Hauser, Beatrix [edt]"
+      ],
+      "id": "EB000402687",
+      "isbns": [
+        "9783319003153"
+      ],
+      "title": "Yoga Traveling : Bodily Practice in Transcultural Perspective",
+      "publicationDates": [
+        "2013"
+      ],
+      "publishers": [
+        "Springer International Publishing"
+      ],
+      "downloads": [
+        {
+          "url": "https://link.springer.com/content/pdf/10.1007%2F978-3-319-00315-3.pdf",
+          "desc": "pdf"
+        },
+        {
+          "url": "https://link.springer.com/download/epub/10.1007%2F978-3-319-00315-3.epub",
+          "desc": "epub"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+}

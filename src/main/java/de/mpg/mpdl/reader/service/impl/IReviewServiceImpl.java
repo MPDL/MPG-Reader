@@ -5,6 +5,7 @@ import de.mpg.mpdl.reader.common.PageUtils;
 import de.mpg.mpdl.reader.dto.BookReviewRQ;
 import de.mpg.mpdl.reader.model.Review;
 import de.mpg.mpdl.reader.repository.ReviewRepository;
+import de.mpg.mpdl.reader.service.IEBookService;
 import de.mpg.mpdl.reader.service.IReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,9 @@ public class IReviewServiceImpl implements IReviewService {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private IEBookService bookService;
+
     @Override
     @Transactional
     public Review submitReview(BookReviewRQ bookReviewRQ, String sn) {
@@ -37,6 +41,7 @@ public class IReviewServiceImpl implements IReviewService {
             review.setOrganization("TODO");
         }
         reviewRepository.save(review);
+        bookService.updateScore(bookReviewRQ.getBooId(), bookReviewRQ.getRating());
         return review;
     }
 

@@ -1,0 +1,29 @@
+{
+  "resultCount": 1,
+  "records": [
+    {
+      "abstract": "This book attempts to bridge the considerable gaps that exist between spiritual philosophies and evidence-based medicine and between the psychotherapeutic models of the East and the West. Based on the insights of both the ancient wisdom and modern medicine, this book presents Yogic science not just as a set of physical exercises or religious rituals but as theories about the mind that have bio-psycho-social implications in relation to health and illness. Drawing on his years of monastic training and his extensive experiential, clinical, and research knowledge on the utility of Yoga meditation in standardized and evidence-based medicine protocols, the author describes symptom-specific clinical applications of Yogic/meditative techniques using standardized protocols for the various psychiatric and psychosomatic conditions. In addition, he explains the value of these techniques in reducing stress and improving quality of life in healthy populations. Dr. Pradhan names the proposed integrative model of psychotherapy Yoga and Mindfulness Based Cognitive Therapy (Y-MBCT). Unlike other models, Y-MBCT uses Yoga in its entirety (all eight limbs, including meditation) rather than piecemeal. The standardized and evidence-based format of Yoga meditation described in this book will help all aspiring Yoga practitioners and will hopefully also provide the impetus for multicenter research studies on the value of this ancient wisdom",
+      "authorsPrimary": [
+        "Pradhan, Basant"
+      ],
+      "id": "EB000900844",
+      "isbns": [
+        "9783319091051"
+      ],
+      "title": "Yoga and Mindfulness Based Cognitive Therapy : A Clinical Guide",
+      "publicationDates": [
+        "2015"
+      ],
+      "publishers": [
+        "Springer International Publishing"
+      ],
+      "downloads": [
+        {
+          "url": "https://link.springer.com/content/pdf/10.1007%2F978-3-319-09105-1.pdf",
+          "desc": "pdf"
+        }
+      ]
+    }
+  ],
+  "status": "OK"
+}
