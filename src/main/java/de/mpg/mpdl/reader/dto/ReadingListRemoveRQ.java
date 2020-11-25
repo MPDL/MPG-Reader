@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * @author denghui.shi@safetytaxfree.com
+ * @author shidenghui@gmail.com
  * @date 2020/11/24
  */
 @Data
