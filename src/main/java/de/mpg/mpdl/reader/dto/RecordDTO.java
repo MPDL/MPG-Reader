@@ -1,20 +1,20 @@
 package de.mpg.mpdl.reader.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 public class RecordDTO {
 
   @SerializedName("abstract")
   @Expose
   private String abs;
-  
+
   private List<String> authorsPrimary;
-  
+
   @JsonIgnore
   private List<String> authorsSecondary;
   private String id;
