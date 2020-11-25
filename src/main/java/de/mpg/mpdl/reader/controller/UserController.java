@@ -6,14 +6,21 @@ import de.mpg.mpdl.reader.common.BeanUtils;
 import de.mpg.mpdl.reader.common.PageUtils;
 import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.BookReviewRQ;
+import de.mpg.mpdl.reader.dto.EBookStatisticRes;
 import de.mpg.mpdl.reader.dto.ReadingListRemoveRQ;
 import de.mpg.mpdl.reader.dto.ReadingListRes;
 import de.mpg.mpdl.reader.dto.ReviewRes;
+import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.model.ReadingList;
 import de.mpg.mpdl.reader.model.Review;
+import de.mpg.mpdl.reader.repository.EBookRepository;
+import de.mpg.mpdl.reader.service.IEBookService;
 import de.mpg.mpdl.reader.service.IReadingListService;
 import de.mpg.mpdl.reader.service.impl.IReviewServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,10 +39,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final IReadingListService readingListService;
     private final IReviewServiceImpl reviewService;
+    private final IEBookService eBookService;
+    private final EBookRepository eBookRepository;
 
-    public UserController(IReadingListService readingListService, IReviewServiceImpl reviewService) {
+    @Autowired
+    public UserController(IReadingListService readingListService, IReviewServiceImpl reviewService,
+                          IEBookService bookService, EBookRepository eBookRepository) {
         this.readingListService = readingListService;
         this.reviewService = reviewService;
+        this.eBookService = bookService;
+        this.eBookRepository = eBookRepository;
     }
 
     /**
@@ -54,8 +67,7 @@ public class UserController {
      */
     @PostMapping(value = "/readinglist/delete")
     public BaseResponseDTO<ReadingListRes> removeFromReadingList(@RequestHeader(name = "X-SN") String sn,
-                                                                 @Validated @RequestBody ReadingListRemoveRQ removeRQ)
-            throws Exception {
+                                                                 @Validated @RequestBody ReadingListRemoveRQ removeRQ) {
         ReadingList readingList = readingListService.removeFromReadingList(removeRQ, sn);
         ReadingListRes readingListRes =  BeanUtils.convertObject(readingList, ReadingListRes.class);
         return ResponseBuilder.buildSuccess(readingListRes);
@@ -67,12 +79,15 @@ public class UserController {
      * Display the books in My Reading List. (This column will not be shown if there is no content in it.)
      */
     @GetMapping(value = "/readinglist")
-    public BaseResponseDTO<ReadingListRes> getReadingList(@RequestHeader(name = "X-SN") String sn,
-                                                          @Validated @RequestBody BasePageRequest pageRequest) {
+    public BaseResponseDTO<Page<EBookStatisticRes>> getReadingList(@RequestHeader(name = "X-SN") String sn,
+                                                      @Validated @RequestBody(required = false) BasePageRequest page) {
         ReadingList readingList = readingListService.getReadingBySn(sn);
-        //TODO fetch books and paging
-        ReadingListRes readingListRes = BeanUtils.convertObject(readingList, ReadingListRes.class);
-        return ResponseBuilder.buildSuccess(readingListRes);
+        if(readingList != null && readingList.getBookIds().size() > 0) {
+            Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC);
+            Page<EBook> bookPage = eBookRepository.findAllByBookIdIn(readingList.getBookIds(), pageable);
+            return ResponseBuilder.buildSuccess(PageUtils.adapterPage(bookPage, EBookStatisticRes.class));
+        }
+        return ResponseBuilder.buildSuccess();
     }
 
     /**
@@ -90,15 +105,5 @@ public class UserController {
         Review review = reviewService.submitReview(bookReviewRQ, sn);
         ReviewRes reviewRes = BeanUtils.convertObject(review, ReviewRes.class);
         return ResponseBuilder.buildSuccess(reviewRes);
-    }
-
-
-
-    @PostMapping(value = "/{bookId}/reviews")
-    public BaseResponseDTO<Page<ReviewRes>> getBookReviewList(@PathVariable String bookId,
-                                                              @Validated @RequestBody BasePageRequest pageRequest) {
-        Page<Review> reviews = reviewService.getReviews(bookId, pageRequest);
-        return ResponseBuilder.buildSuccess(PageUtils.adapterPage(reviews, ReviewRes.class));
-
     }
 }

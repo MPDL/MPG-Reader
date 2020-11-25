@@ -1,6 +1,5 @@
 package de.mpg.mpdl.reader.model;
 
-import de.mpg.mpdl.reader.common.Constants;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -34,7 +33,7 @@ public class Review extends BaseModel {
     private String bookId;
 
     @Column(name = "rating")
-    private Constants.Rating rating;
+    private int rating;
 
     //max length?
     @Column(name = "comment")

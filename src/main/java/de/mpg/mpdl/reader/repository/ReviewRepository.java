@@ -12,5 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends BaseRepository<Review, Long> {
     Page<Review> getAllByBookId(String bookId, Pageable pageable);
+
+    Review getByBookIdAndSn(String bookId, String sn);
+
     Page<Review> getAllBySn(String sn, Pageable pageable);
 }

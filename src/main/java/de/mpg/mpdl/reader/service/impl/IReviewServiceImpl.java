@@ -1,8 +1,11 @@
 package de.mpg.mpdl.reader.service.impl;
 
 import de.mpg.mpdl.reader.common.BasePageRequest;
+import de.mpg.mpdl.reader.common.Constants;
 import de.mpg.mpdl.reader.common.PageUtils;
+import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.BookReviewRQ;
+import de.mpg.mpdl.reader.exception.ReaderException;
 import de.mpg.mpdl.reader.model.Review;
 import de.mpg.mpdl.reader.repository.ReviewRepository;
 import de.mpg.mpdl.reader.service.IEBookService;
@@ -12,6 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author shidenghui@gmail.com
@@ -29,9 +35,16 @@ public class IReviewServiceImpl implements IReviewService {
     @Override
     @Transactional
     public Review submitReview(BookReviewRQ bookReviewRQ, String sn) {
-        Review review = new Review();
+        Review review = reviewRepository.getByBookIdAndSn(bookReviewRQ.getBooId(), sn);
+        if(review != null){
+            throw new ReaderException(ResponseBuilder.RetCode.ERROR_400002);
+        }
+        review = new Review();
         review.setBookId(bookReviewRQ.getBooId());
-        review.setRating(bookReviewRQ.getRating());
+        Optional<Constants.Rating> ratingOptional = Arrays.stream(Constants.Rating.values())
+                .filter(p -> p.equals(bookReviewRQ.getRating()))
+                .findFirst();
+        review.setRating(ratingOptional.get().getRate());
         review.setComment(bookReviewRQ.getComment());
         review.setUserName(bookReviewRQ.getName());
         review.setSn(sn);

@@ -18,6 +18,8 @@ public interface IEBookService {
 
     RecordDTO getRemoteBookById(String bookId);
 
+    EBook createEBookIfNotExists(String bookId);
+
     EBook notifyDownloads(String bookId, String sn);
 
     Page<EBook> getTopDownloadsBooks(BasePageRequest pageRequest);

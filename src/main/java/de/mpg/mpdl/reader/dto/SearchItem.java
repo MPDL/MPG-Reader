@@ -17,6 +17,8 @@ public class SearchItem {
   private List<String> publicationDates;
   private List<String> publishers;
   private String thumbnail;
+
+  private double rating;
 }
 
 

@@ -8,9 +8,9 @@ import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.EBookStatisticRes;
 import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.service.IEBookService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,11 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/rest/statistic")
 public class StatisticController {
-    private final IEBookService eBookService;
 
-    public StatisticController(IEBookService eBookService) {
-        this.eBookService = eBookService;
-    }
+    @Autowired
+    private IEBookService eBookService;
 
     /**
      * inform download action
@@ -47,7 +45,8 @@ public class StatisticController {
      * Display the most downloaded books based on {DeviceSerialNumber}.(Load on demand)
      */
     @PostMapping(value = "/topDownloads")
-    public BaseResponseDTO<Page<EBookStatisticRes>> getByDownloads(@Validated @RequestBody BasePageRequest pageRequest) {
+    public BaseResponseDTO<Page<EBookStatisticRes>> getByDownloads(@Validated @RequestBody(required = false)
+                                                                               BasePageRequest pageRequest) {
         Page<EBook> eBookPage = eBookService.getTopDownloadsBooks(pageRequest);
         return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookStatisticRes.class));
     }
@@ -57,20 +56,9 @@ public class StatisticController {
      * Display the top books rated by users. (Load on demand)
      */
     @PostMapping(value = "/topScores")
-    public BaseResponseDTO<Page<EBookStatisticRes>> getByScores(@Validated @RequestBody BasePageRequest pageRequest) {
+    public BaseResponseDTO<Page<EBookStatisticRes>> getByScores(@Validated @RequestBody(required = false)
+                                                                            BasePageRequest pageRequest) {
         Page<EBook> eBookPage = eBookService.getTopRatedBooks(pageRequest);
         return ResponseBuilder.buildSuccess(PageUtils.adapterPage(eBookPage, EBookStatisticRes.class));
-    }
-
-    /**
-     * Info-Page of the Book:
-     *  The average rating of the book and the amount of the reviews
-     *  The rating given by the user
-     */
-    @GetMapping(value = "/{bookId}")
-    public BaseResponseDTO<EBookStatisticRes> getBookStatistics(@PathVariable String bookId) {
-        EBook eBook = eBookService.getByBookId(bookId);
-        EBookStatisticRes eBookStatisticRes = BeanUtils.convertObject(eBook, EBookStatisticRes.class);
-        return ResponseBuilder.buildSuccess(eBookStatisticRes);
     }
 }

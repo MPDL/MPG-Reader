@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 /**
  * @author shidenghui@gmail.com
  * @date 2020/11/17
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EBookRepository extends BaseRepository<EBook, Long> {
     EBook findByBookId(String BookId);
+
+    Page<EBook> findAllByBookIdIn(Set<String> bookIds, Pageable pageable);
 
     Page<EBook> findAllByOrderByDownloads(Pageable pageable);
 

@@ -1,7 +1,6 @@
 package de.mpg.mpdl.reader.dto;
 
 import de.mpg.mpdl.reader.common.BaseRS;
-import de.mpg.mpdl.reader.common.Constants;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ReviewRes extends BaseRS {
-  private Constants.Rating rating;
+  private int rating;
 
   private String comment;
 

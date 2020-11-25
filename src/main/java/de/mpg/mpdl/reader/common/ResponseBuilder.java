@@ -15,12 +15,15 @@ public class ResponseBuilder {
         /**
          * Invalid parameter!
          */
-        ERROR_400000(400000, "无效的参数"),
+        ERROR_400000(400000, "illegal parameter"),
+
+        ERROR_400002(400002, "duplicate review"),
 
         /**
          * Server internal error response with code 50003.
          */
         ERROR_500003(500003, "service unavailable now, try later.");
+
 
         private int code;
         private String message;

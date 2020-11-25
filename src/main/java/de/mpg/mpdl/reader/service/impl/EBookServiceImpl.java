@@ -55,7 +55,7 @@ public class EBookServiceImpl implements IEBookService {
                         .queryParam("filter[]", "~prodcode_str_mv:Springer")
                         .queryParam("sort", "relevance")
                         .queryParam("page", "1")
-                        .queryParam("limit", "20")
+                        .queryParam("limit", "10")
                         .queryParam("prettyPrint", "false")
                         .queryParam("lng", "en");
 //        SearchResponseDTO responseDTO = restTemplate.getForObject(builder.buildAndExpand().toUri(), SearchResponseDTO.class);
@@ -88,7 +88,6 @@ public class EBookServiceImpl implements IEBookService {
                         .queryParam("lng", "en")
                         .queryParam("field[]", "abstract", "authorsPrimary", "authorsSecondary", "id", "isbns",
                                 "title", "urlPdf_str", "publicationDates", "publishers", "downloads");
-
         /**
         RecordResponseDTO responseDTO = restTemplate.getForObject(builder.buildAndExpand().toUri(), RecordResponseDTO.class);
         if (responseDTO != null && responseDTO.getRecords() != null) {
@@ -117,8 +116,65 @@ public class EBookServiceImpl implements IEBookService {
                 }
             }
         }
-         */
+         **/
+        RecordResponseDTO responseDTO = buildMockupBook();
+        return responseDTO.getRecords().get(0);
+    }
 
+    @Override
+    @Transactional
+    public EBook notifyDownloads(String bookId, String sn) {
+        EBook eBook = createEBookIfNotExists(bookId);
+        if (!eBook.getDownloadedBySn().contains(sn)) {
+            eBook.setDownloads(eBook.getDownloads() + 1);
+            eBook.getDownloadedBySn().add(sn);
+        }
+        eBookRepository.save(eBook);
+        return eBook;
+    }
+
+    @Override
+    public Page<EBook> getTopDownloadsBooks(BasePageRequest page) {
+        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC, "downloads");
+        return eBookRepository.findAllByOrderByDownloads(pageable);
+    }
+
+    @Override
+    public Page<EBook> getTopRatedBooks(BasePageRequest page) {
+        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC, "rating");
+        return eBookRepository.findAllByOrderByRating(pageable);
+    }
+
+    @Override
+    public EBook getByBookId(String bookId) {
+        return eBookRepository.findByBookId(bookId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateScore(String bookId, Constants.Rating rating) {
+        EBook eBook = createEBookIfNotExists(bookId);
+        eBookRepository.save(eBook);
+    }
+
+    @Override
+    @Transactional
+    public EBook createEBookIfNotExists(String bookId) {
+        EBook eBook = eBookRepository.findByBookId(bookId);
+        if (eBook == null) {
+            eBook = new EBook(bookId);
+            //TODO dummy
+            RecordResponseDTO recordResponseDTO = buildMockupBook();
+            RecordDTO recordDTO = recordResponseDTO.getRecords().get(0);
+            eBook.setBookName(recordDTO.getTitle());
+            eBook.setBookCoverURL(recordDTO.getThumbnail());
+            eBookRepository.save(eBook);
+        }
+        return eBook;
+    }
+
+
+    public RecordResponseDTO buildMockupBook() {
         //todo: remove dummy data
         String response;
         try (InputStream inputStream = EBookServiceImpl.class.getResourceAsStream("/response/EB000900844.json")) {
@@ -150,49 +206,6 @@ public class EBookServiceImpl implements IEBookService {
             }
         }
         //todo: remove dummy data
-        return responseDTO.getRecords().get(0);
-    }
-
-    @Override
-    @Transactional
-    public EBook notifyDownloads(String bookId, String sn) {
-        EBook eBook = eBookRepository.findByBookId(bookId);
-        if (eBook == null) {
-            eBook = new EBook(bookId);
-        }
-        if (!eBook.getDownloadedBySn().contains(sn)) {
-            eBook.setDownloads(eBook.getDownloads() + 1);
-            eBook.getDownloadedBySn().add(sn);
-        }
-        eBookRepository.save(eBook);
-        return eBook;
-    }
-
-    @Override
-    public Page<EBook> getTopDownloadsBooks(BasePageRequest page) {
-        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC, "downloads");
-        return eBookRepository.findAllByOrderByDownloads(pageable);
-    }
-
-    @Override
-    public Page<EBook> getTopRatedBooks(BasePageRequest page) {
-        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC, "rating");
-        return eBookRepository.findAllByOrderByRating(pageable);
-    }
-
-    @Override
-    public EBook getByBookId(String bookId) {
-        return eBookRepository.findByBookId(bookId);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateScore(String bookId, Constants.Rating rating) {
-        EBook eBook = eBookRepository.findByBookId(bookId);
-        if (eBook == null) {
-            eBook = new EBook(bookId);
-        }
-        eBook.caculateRatingAndScore(rating);
-        eBookRepository.save(eBook);
+        return responseDTO;
     }
 }

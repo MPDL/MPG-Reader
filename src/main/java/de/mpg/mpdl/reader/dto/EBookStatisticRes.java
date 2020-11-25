@@ -24,7 +24,5 @@ public class EBookStatisticRes extends BaseRS {
 
   private Double rating;
 
-  private Double score;
-
-  private boolean inReadingList;
+  private boolean inReadingList = false;
 }

@@ -1,5 +1,6 @@
 package de.mpg.mpdl.reader.model;
 
+import de.mpg.mpdl.reader.common.CommonUtils;
 import de.mpg.mpdl.reader.common.Constants;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,6 +38,12 @@ public class EBook extends BaseModel {
     @Column(name = "bookId")
     private String bookId;
 
+    @Column(name = "book_name")
+    private String bookName;
+
+    @Column(name = "book_cover_url")
+    private String bookCoverURL;
+
     @Column(name = "downloads")
     private int downloads = 0;
 
@@ -59,7 +66,7 @@ public class EBook extends BaseModel {
 
     public void caculateRatingAndScore(Constants.Rating newRating) {
         int newReviewsCount = reviews + 1;
-        this.rating = (rating * reviews + newRating.getRate()) / newReviewsCount;
+        this.rating = CommonUtils.round(((rating * reviews + newRating.getRate()) / newReviewsCount), 2);
         this.reviews = newReviewsCount;
     }
 }

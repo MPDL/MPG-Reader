@@ -14,6 +14,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ReadingListRes extends BaseRS {
-    private String email;
+    private String sn;
     private List<String> bookIds;
 }

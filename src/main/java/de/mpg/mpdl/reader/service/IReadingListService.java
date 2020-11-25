@@ -11,5 +11,5 @@ public interface IReadingListService {
     ReadingList addBookingIntoReadingList(String booId, String sn);
     ReadingList getReadingByUser(String email);
     ReadingList getReadingBySn(String sn);
-    ReadingList removeFromReadingList(ReadingListRemoveRQ removeRQ, String sn) throws Exception;
+    ReadingList removeFromReadingList(ReadingListRemoveRQ removeRQ, String sn);
 }
