@@ -14,7 +14,6 @@ import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.model.ReadingList;
 import de.mpg.mpdl.reader.model.Review;
 import de.mpg.mpdl.reader.repository.EBookRepository;
-import de.mpg.mpdl.reader.service.IEBookService;
 import de.mpg.mpdl.reader.service.IReadingListService;
 import de.mpg.mpdl.reader.service.impl.IReviewServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +38,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final IReadingListService readingListService;
     private final IReviewServiceImpl reviewService;
-    private final IEBookService eBookService;
     private final EBookRepository eBookRepository;
 
     @Autowired
     public UserController(IReadingListService readingListService, IReviewServiceImpl reviewService,
-                          IEBookService bookService, EBookRepository eBookRepository) {
+                          EBookRepository eBookRepository) {
         this.readingListService = readingListService;
         this.reviewService = reviewService;
-        this.eBookService = bookService;
         this.eBookRepository = eBookRepository;
     }
 
