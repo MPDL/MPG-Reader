@@ -5,6 +5,7 @@ import de.mpg.mpdl.reader.common.BaseResponseDTO;
 import de.mpg.mpdl.reader.common.BeanUtils;
 import de.mpg.mpdl.reader.common.PageUtils;
 import de.mpg.mpdl.reader.common.ResponseBuilder;
+import de.mpg.mpdl.reader.dto.CitationRS;
 import de.mpg.mpdl.reader.dto.EBookStatisticRes;
 import de.mpg.mpdl.reader.dto.RecordDTO;
 import de.mpg.mpdl.reader.dto.ReviewRes;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -81,7 +83,27 @@ public class EBooksController {
                                               @Validated @RequestBody(required = false) BasePageRequest pageRequest) {
         Page<Review> reviews = reviewService.getReviews(bookId, pageRequest);
         return ResponseBuilder.buildSuccess(PageUtils.adapterPage(reviews, ReviewRes.class));
-
     }
 
+    /**
+     * https://ebooks.mpdl.mpg.de/ebooks/Record/EB000402687/Cite
+     *
+     * Styles of Citation (Guidelines will be delivered separately):
+     * APA Citation:
+     * Hauser, B. (2013). Yoga Traveling: Bodily Practice in Transcultural Perspective (1st ed. 2013.).
+     * Cham: Springer International Publishing.
+     *
+     * Chicago Style Citation:
+     * Hauser, Beatrix. Yoga Traveling: Bodily Practice in Transcultural Perspective. 1st ed. 2013. Cham: Springer
+     * International Publishing, 2013.
+     *
+     * MLA Citation
+     * Hauser, Beatrix. Yoga Traveling: Bodily Practice in Transcultural Perspective. 1st ed. 2013. Cham: Springer
+     * International Publishing, 2013.
+     */
+    @GetMapping(value = "/{bookId}/citations")
+    public BaseResponseDTO<CitationRS> getCitation(@PathVariable String bookId) throws IOException {
+        CitationRS citationRS = eBookService.fetchCitation(bookId);
+        return ResponseBuilder.buildSuccess(citationRS);
+    }
 }

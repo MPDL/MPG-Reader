@@ -19,6 +19,8 @@ public class ResponseBuilder {
 
         ERROR_400002(400002, "duplicate review"),
 
+        ERROR_400003(400003, "no citations are available"),
+
         /**
          * Server internal error response with code 50003.
          */

@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class BookReviewRQ {
     @NotBlank
-    private String booId;
+    private String bookId;
     @NotNull
     private Constants.Rating rating;
     private String comment;

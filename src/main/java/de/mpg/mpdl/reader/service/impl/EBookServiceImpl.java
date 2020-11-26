@@ -4,14 +4,21 @@ import de.mpg.mpdl.reader.common.BasePageRequest;
 import de.mpg.mpdl.reader.common.Constants;
 import de.mpg.mpdl.reader.common.GsonUtils;
 import de.mpg.mpdl.reader.common.PageUtils;
+import de.mpg.mpdl.reader.common.ResponseBuilder;
+import de.mpg.mpdl.reader.dto.CitationRS;
 import de.mpg.mpdl.reader.dto.RecordDTO;
 import de.mpg.mpdl.reader.dto.RecordResponseDTO;
 import de.mpg.mpdl.reader.dto.SearchItem;
 import de.mpg.mpdl.reader.dto.SearchResponseDTO;
+import de.mpg.mpdl.reader.exception.ReaderException;
 import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.repository.EBookRepository;
 import de.mpg.mpdl.reader.service.IEBookService;
 import io.micrometer.core.instrument.util.IOUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -24,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -154,7 +162,17 @@ public class EBookServiceImpl implements IEBookService {
     @Transactional(rollbackFor = Exception.class)
     public void updateScore(String bookId, Constants.Rating rating) {
         EBook eBook = createEBookIfNotExists(bookId);
+        eBook.caculateRatingAndScore(rating);
         eBookRepository.save(eBook);
+    }
+
+    @Override
+    public CitationRS fetchCitation(String bookId) throws IOException {
+        HashMap<String, String> hashMap = extractCitations(bookId);
+        CitationRS citationRS = new CitationRS();
+        citationRS.setBookId(bookId);
+        citationRS.setCitationContents(hashMap);
+        return citationRS;
     }
 
     @Override
@@ -163,7 +181,7 @@ public class EBookServiceImpl implements IEBookService {
         EBook eBook = eBookRepository.findByBookId(bookId);
         if (eBook == null) {
             eBook = new EBook(bookId);
-            //TODO dummy
+            //TODO remove dummy
             RecordResponseDTO recordResponseDTO = buildMockupBook();
             RecordDTO recordDTO = recordResponseDTO.getRecords().get(0);
             eBook.setBookName(recordDTO.getTitle());
@@ -208,4 +226,30 @@ public class EBookServiceImpl implements IEBookService {
         //todo: remove dummy data
         return responseDTO;
     }
+
+    private HashMap<String, String> extractCitations(String bookId) {
+        HashMap<String, String> hashMap = new HashMap<>(5);
+        try {
+            String url = "https://ebooks.mpdl.mpg.de/ebooks/Record/" + bookId + "/Cite";
+            Document doc = Jsoup.connect(url).get();
+            Elements citations = doc.select("#content");
+            for(Element element: citations){
+                for(int i =0; i< element.children().size(); i++){
+                    if(element.children().get(i).text().contains("APA")){
+                        hashMap.put("APA", element.children().get(i+1).text());
+                    }
+                    if(element.children().get(i).text().contains("Chicago")){
+                        hashMap.put("Chicago", element.children().get(i+1).text());
+                    }
+                    if(element.children().get(i).text().contains("MLA")){
+                        hashMap.put("MLA", element.children().get(i+1).text());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ReaderException(ResponseBuilder.RetCode.ERROR_400003);
+        }
+        return hashMap;
+    }
+
 }

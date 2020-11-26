@@ -31,6 +31,9 @@ public class PageUtils {
     }
 
     public static Pageable createPageable(BasePageRequest pageRequest) {
+        if(pageRequest == null){
+            pageRequest = new BasePageRequest();
+        }
         return createPageable(pageRequest.getPageNumber(), pageRequest.getPageSize(), Sort.Direction.DESC, "createDate");
     }
 
