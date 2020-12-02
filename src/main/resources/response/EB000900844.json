@@ -22,7 +22,8 @@
           "url": "https://link.springer.com/content/pdf/10.1007%2F978-3-319-09105-1.pdf",
           "desc": "pdf"
         }
-      ]
+      ],
+      "doi": "https://doi.org/10.1007/978-3-319-09105-1?nosfx=y"
     }
   ],
   "status": "OK"

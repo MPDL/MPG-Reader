@@ -22,6 +22,7 @@ public class RecordDTO {
   private String title;
   @JsonProperty("downloadUrl")
   private String urlPdf_str;
+  private String doi;
   private List<String> publicationDates;
   private List<String> publishers;
   @JsonIgnore
@@ -125,5 +126,13 @@ public class RecordDTO {
 
   public void setDownloads(List<DownloadDTO> downloads) {
     this.downloads = downloads;
+  }
+
+  public String getDoi() {
+    return doi;
+  }
+
+  public void setDoi(String doi) {
+    this.doi = doi;
   }
 }

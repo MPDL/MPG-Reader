@@ -125,7 +125,7 @@ public class EBookServiceImpl implements IEBookService {
             }
         }
          **/
-        RecordResponseDTO responseDTO = buildMockupBook();
+        RecordResponseDTO responseDTO = buildMockupBook(bookId);
         return responseDTO.getRecords().get(0);
     }
 
@@ -182,7 +182,7 @@ public class EBookServiceImpl implements IEBookService {
         if (eBook == null) {
             eBook = new EBook(bookId);
             //TODO remove dummy
-            RecordResponseDTO recordResponseDTO = buildMockupBook();
+            RecordResponseDTO recordResponseDTO = buildMockupBook(bookId);
             RecordDTO recordDTO = recordResponseDTO.getRecords().get(0);
             eBook.setBookName(recordDTO.getTitle());
             eBook.setBookCoverURL(recordDTO.getThumbnail());
@@ -192,14 +192,26 @@ public class EBookServiceImpl implements IEBookService {
     }
 
 
-    public RecordResponseDTO buildMockupBook() {
+    public RecordResponseDTO buildMockupBook(String bookId) {
         //todo: remove dummy data
+        String jsonFile;
+        boolean isPDF = true;
+        int downloadIndex = 0;
+        if("EB000900844".equals(bookId)){
+            jsonFile = "/response/EB000900844.json";
+        }else {
+            jsonFile = "/response/EB000402687.json";
+            isPDF = false;
+            downloadIndex = 5;
+        }
+
         String response;
-        try (InputStream inputStream = EBookServiceImpl.class.getResourceAsStream("/response/EB000900844.json")) {
+        try (InputStream inputStream = EBookServiceImpl.class.getResourceAsStream(jsonFile)) {
             response = IOUtils.toString(inputStream);
         } catch (IOException e) {
             response = "{}";
         }
+
         RecordResponseDTO responseDTO = GsonUtils.fromJson(response, RecordResponseDTO.class);
         String[] urls = new String[]{"https://keeper.mpdl.mpg.de/f/6cd11bdbe4894c4c85f8/?dl=1",
                 "https://keeper.mpdl.mpg.de/f/7524353b2721433fae88/?dl=1",
@@ -210,12 +222,9 @@ public class EBookServiceImpl implements IEBookService {
                 "https://keeper.mpdl.mpg.de/f/f672dffa8dc34c95842a/?dl=1",
                 "https://keeper.mpdl.mpg.de/f/d14ff8ba4a3e4cda81e2/?dl=1"
         };
-        boolean[] formats = new boolean[]{true, false};
         for (RecordDTO record : responseDTO.getRecords()) {
-            int format = record.getTitle().length() % 2;
-            int index = record.getTitle().length() % 8;
-            record.setIsPdf(formats[format]);
-            record.setDownloadUrl(urls[index]);
+            record.setIsPdf(isPDF);
+            record.setDownloadUrl(urls[downloadIndex]);
             if (!record.getIsbns().isEmpty()) {
                 record.setThumbnail(eBookCoverUrl + record.getIsbns().get(0));
             }
