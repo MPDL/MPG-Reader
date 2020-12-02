@@ -35,7 +35,7 @@ public class EBook extends BaseModel {
     @Column(name = "ebook_id", updatable = false, nullable = false)
     private Long eBookId;
 
-    @Column(name = "bookId")
+    @Column(name = "bookId", nullable = false, unique = true)
     private String bookId;
 
     @Column(name = "book_name")

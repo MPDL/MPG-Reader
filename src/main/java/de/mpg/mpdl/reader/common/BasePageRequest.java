@@ -28,5 +28,4 @@ public class BasePageRequest {
         }
         return Sort.unsorted();
     }
-
 }

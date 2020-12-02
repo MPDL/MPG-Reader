@@ -2,11 +2,13 @@ package de.mpg.mpdl.reader.service;
 
 import de.mpg.mpdl.reader.common.BasePageRequest;
 import de.mpg.mpdl.reader.common.Constants;
+import de.mpg.mpdl.reader.dto.CitationRS;
 import de.mpg.mpdl.reader.dto.RecordDTO;
 import de.mpg.mpdl.reader.dto.SearchItem;
 import de.mpg.mpdl.reader.model.EBook;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,4 +31,6 @@ public interface IEBookService {
     EBook getByBookId(String bookId);
 
     void updateScore(String booId, Constants.Rating rating);
+
+    CitationRS fetchCitation(String bookId) throws IOException;
 }

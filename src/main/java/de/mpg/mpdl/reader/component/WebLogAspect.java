@@ -61,7 +61,7 @@ public class WebLogAspect {
     }
 
     @Around("webLog()")
-    public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object doAround(ProceedingJoinPoint joinPoint) {
         long startTime = System.currentTimeMillis();
         //获取当前请求对象
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -81,7 +81,7 @@ public class WebLogAspect {
                 return ResponseBuilder.buildCommon(readerException.getRetCode());
             } else {
                 webLog.setDescription(ex.getMessage());
-                throw ex;
+                return ResponseBuilder.buildCommon(ResponseBuilder.RetCode.ERROR_500003);
             }
         }
 
@@ -147,7 +147,7 @@ public class WebLogAspect {
         }
     }
 
-    private boolean hasAnnotation(ProceedingJoinPoint point, Class clazz) throws NoSuchMethodException {
+    private boolean hasAnnotation(ProceedingJoinPoint point, Class clazz) {
         String methodName = point.getSignature().getName();
         Class<?> classTarget = point.getTarget().getClass();
         Class<?>[] par = ((MethodSignature) point.getSignature()).getParameterTypes();
@@ -160,7 +160,7 @@ public class WebLogAspect {
                 }
             }
         } catch (NoSuchMethodException e) {
-            throw e;
+            LOGGER.error("restExceptionHandler " + e.getMessage());
         }
         return false;
     }

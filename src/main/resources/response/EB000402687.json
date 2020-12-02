@@ -26,7 +26,8 @@
           "url": "https://link.springer.com/download/epub/10.1007%2F978-3-319-00315-3.epub",
           "desc": "epub"
         }
-      ]
+      ],
+      "doi": "https://doi.org/10.1007/978-3-319-00315-3?nosfx=y"
     }
   ],
   "status": "OK"

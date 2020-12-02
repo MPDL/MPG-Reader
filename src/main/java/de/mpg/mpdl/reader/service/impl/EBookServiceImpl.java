@@ -4,14 +4,21 @@ import de.mpg.mpdl.reader.common.BasePageRequest;
 import de.mpg.mpdl.reader.common.Constants;
 import de.mpg.mpdl.reader.common.GsonUtils;
 import de.mpg.mpdl.reader.common.PageUtils;
+import de.mpg.mpdl.reader.common.ResponseBuilder;
+import de.mpg.mpdl.reader.dto.CitationRS;
 import de.mpg.mpdl.reader.dto.RecordDTO;
 import de.mpg.mpdl.reader.dto.RecordResponseDTO;
 import de.mpg.mpdl.reader.dto.SearchItem;
 import de.mpg.mpdl.reader.dto.SearchResponseDTO;
+import de.mpg.mpdl.reader.exception.ReaderException;
 import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.repository.EBookRepository;
 import de.mpg.mpdl.reader.service.IEBookService;
 import io.micrometer.core.instrument.util.IOUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -24,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -117,7 +125,7 @@ public class EBookServiceImpl implements IEBookService {
             }
         }
          **/
-        RecordResponseDTO responseDTO = buildMockupBook();
+        RecordResponseDTO responseDTO = buildMockupBook(bookId);
         return responseDTO.getRecords().get(0);
     }
 
@@ -154,7 +162,17 @@ public class EBookServiceImpl implements IEBookService {
     @Transactional(rollbackFor = Exception.class)
     public void updateScore(String bookId, Constants.Rating rating) {
         EBook eBook = createEBookIfNotExists(bookId);
+        eBook.caculateRatingAndScore(rating);
         eBookRepository.save(eBook);
+    }
+
+    @Override
+    public CitationRS fetchCitation(String bookId) throws IOException {
+        HashMap<String, String> hashMap = extractCitations(bookId);
+        CitationRS citationRS = new CitationRS();
+        citationRS.setBookId(bookId);
+        citationRS.setCitationContents(hashMap);
+        return citationRS;
     }
 
     @Override
@@ -163,8 +181,8 @@ public class EBookServiceImpl implements IEBookService {
         EBook eBook = eBookRepository.findByBookId(bookId);
         if (eBook == null) {
             eBook = new EBook(bookId);
-            //TODO dummy
-            RecordResponseDTO recordResponseDTO = buildMockupBook();
+            //TODO remove dummy
+            RecordResponseDTO recordResponseDTO = buildMockupBook(bookId);
             RecordDTO recordDTO = recordResponseDTO.getRecords().get(0);
             eBook.setBookName(recordDTO.getTitle());
             eBook.setBookCoverURL(recordDTO.getThumbnail());
@@ -174,14 +192,26 @@ public class EBookServiceImpl implements IEBookService {
     }
 
 
-    public RecordResponseDTO buildMockupBook() {
+    public RecordResponseDTO buildMockupBook(String bookId) {
         //todo: remove dummy data
+        String jsonFile;
+        boolean isPDF = true;
+        int downloadIndex = 0;
+        if("EB000900844".equals(bookId)){
+            jsonFile = "/response/EB000900844.json";
+        }else {
+            jsonFile = "/response/EB000402687.json";
+            isPDF = false;
+            downloadIndex = 5;
+        }
+
         String response;
-        try (InputStream inputStream = EBookServiceImpl.class.getResourceAsStream("/response/EB000900844.json")) {
+        try (InputStream inputStream = EBookServiceImpl.class.getResourceAsStream(jsonFile)) {
             response = IOUtils.toString(inputStream);
         } catch (IOException e) {
             response = "{}";
         }
+
         RecordResponseDTO responseDTO = GsonUtils.fromJson(response, RecordResponseDTO.class);
         String[] urls = new String[]{"https://keeper.mpdl.mpg.de/f/6cd11bdbe4894c4c85f8/?dl=1",
                 "https://keeper.mpdl.mpg.de/f/7524353b2721433fae88/?dl=1",
@@ -192,12 +222,9 @@ public class EBookServiceImpl implements IEBookService {
                 "https://keeper.mpdl.mpg.de/f/f672dffa8dc34c95842a/?dl=1",
                 "https://keeper.mpdl.mpg.de/f/d14ff8ba4a3e4cda81e2/?dl=1"
         };
-        boolean[] formats = new boolean[]{true, false};
         for (RecordDTO record : responseDTO.getRecords()) {
-            int format = record.getTitle().length() % 2;
-            int index = record.getTitle().length() % 8;
-            record.setIsPdf(formats[format]);
-            record.setDownloadUrl(urls[index]);
+            record.setIsPdf(isPDF);
+            record.setDownloadUrl(urls[downloadIndex]);
             if (!record.getIsbns().isEmpty()) {
                 record.setThumbnail(eBookCoverUrl + record.getIsbns().get(0));
             }
@@ -208,4 +235,30 @@ public class EBookServiceImpl implements IEBookService {
         //todo: remove dummy data
         return responseDTO;
     }
+
+    private HashMap<String, String> extractCitations(String bookId) {
+        HashMap<String, String> hashMap = new HashMap<>(5);
+        try {
+            String url = "https://ebooks.mpdl.mpg.de/ebooks/Record/" + bookId + "/Cite";
+            Document doc = Jsoup.connect(url).get();
+            Elements citations = doc.select("#content");
+            for(Element element: citations){
+                for(int i =0; i< element.children().size(); i++){
+                    if(element.children().get(i).text().contains("APA")){
+                        hashMap.put("APA", element.children().get(i+1).text());
+                    }
+                    if(element.children().get(i).text().contains("Chicago")){
+                        hashMap.put("Chicago", element.children().get(i+1).text());
+                    }
+                    if(element.children().get(i).text().contains("MLA")){
+                        hashMap.put("MLA", element.children().get(i+1).text());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ReaderException(ResponseBuilder.RetCode.ERROR_400003);
+        }
+        return hashMap;
+    }
+
 }

@@ -126,19 +126,22 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.0.CR3</version>
         </dependency>
-
         <!--Hutool Java工具包-->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>4.5.7</version>
         </dependency>
-
         <!--集成logstash-->
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.10.2</version>
         </dependency>
     </dependencies>
 

@@ -19,9 +19,7 @@ import de.mpg.mpdl.reader.service.impl.IReviewServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -75,12 +73,12 @@ public class UserController {
      * My Reading List (no shown if reading list is empty):
      * Display the books in My Reading List. (This column will not be shown if there is no content in it.)
      */
-    @GetMapping(value = "/readinglist")
+    @PostMapping(value = "/readinglist")
     public BaseResponseDTO<Page<EBookStatisticRes>> getReadingList(@RequestHeader(name = "X-SN") String sn,
                                                       @Validated @RequestBody(required = false) BasePageRequest page) {
         ReadingList readingList = readingListService.getReadingBySn(sn);
         if(readingList != null && readingList.getBookIds().size() > 0) {
-            Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC);
+            Pageable pageable = PageUtils.createPageable(page);
             Page<EBook> bookPage = eBookRepository.findAllByBookIdIn(readingList.getBookIds(), pageable);
             return ResponseBuilder.buildSuccess(PageUtils.adapterPage(bookPage, EBookStatisticRes.class));
         }

@@ -35,12 +35,12 @@ public class IReviewServiceImpl implements IReviewService {
     @Override
     @Transactional
     public Review submitReview(BookReviewRQ bookReviewRQ, String sn) {
-        Review review = reviewRepository.getByBookIdAndSn(bookReviewRQ.getBooId(), sn);
+        Review review = reviewRepository.getByBookIdAndSn(bookReviewRQ.getBookId(), sn);
         if(review != null){
             throw new ReaderException(ResponseBuilder.RetCode.ERROR_400002);
         }
         review = new Review();
-        review.setBookId(bookReviewRQ.getBooId());
+        review.setBookId(bookReviewRQ.getBookId());
         Optional<Constants.Rating> ratingOptional = Arrays.stream(Constants.Rating.values())
                 .filter(p -> p.equals(bookReviewRQ.getRating()))
                 .findFirst();
@@ -54,7 +54,7 @@ public class IReviewServiceImpl implements IReviewService {
             review.setOrganization("TODO");
         }
         reviewRepository.save(review);
-        bookService.updateScore(bookReviewRQ.getBooId(), bookReviewRQ.getRating());
+        bookService.updateScore(bookReviewRQ.getBookId(), bookReviewRQ.getRating());
         return review;
     }
 
