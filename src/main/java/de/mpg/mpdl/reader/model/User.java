@@ -35,6 +35,9 @@ public class User extends BaseModel {
     @Column(name = "email", unique = true)
     private String email;
 
+    @Column(name = "ou")
+    private String ou;
+
     @ElementCollection
     @LazyCollection(LazyCollectionOption.FALSE)
     @CollectionTable(joinColumns = @JoinColumn(name = "user_id"))

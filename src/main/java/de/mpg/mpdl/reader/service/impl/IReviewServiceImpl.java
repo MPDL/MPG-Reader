@@ -49,7 +49,6 @@ public class IReviewServiceImpl implements IReviewService {
         review.setUserName(bookReviewRQ.getName());
         review.setSn(sn);
         if(bookReviewRQ.getShowOrg()) {
-            //TODO how to fetch org, ldap?
             //ou=Max Planck Digital Library,ou=MPG
             review.setOrganization("TODO");
         }

@@ -6,6 +6,7 @@ import de.mpg.mpdl.reader.common.GsonUtils;
 import de.mpg.mpdl.reader.common.PageUtils;
 import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.CitationRS;
+import de.mpg.mpdl.reader.dto.DownloadDTO;
 import de.mpg.mpdl.reader.dto.RecordDTO;
 import de.mpg.mpdl.reader.dto.RecordResponseDTO;
 import de.mpg.mpdl.reader.dto.SearchItem;
@@ -32,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -47,6 +49,9 @@ public class EBookServiceImpl implements IEBookService {
     @Value("${ebook.cover.base.url}")
     private String eBookCoverUrl;
 
+    @Value("${ebook.mock.mode}")
+    private boolean mock;
+
     @Autowired
     private EBookRepository eBookRepository;
 
@@ -56,8 +61,8 @@ public class EBookServiceImpl implements IEBookService {
 
     @Override
     public List<SearchItem> searchRemoteBooks(String keyword) {
-        UriComponentsBuilder builder =
-                UriComponentsBuilder.fromUriString(eBookAPIUrl + "/search")
+        List<SearchItem> ret = new LinkedList<>();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(eBookAPIUrl + "/search")
                         .queryParam("lookfor", keyword)
                         .queryParam("type", "AllFields")
                         .queryParam("filter[]", "~prodcode_str_mv:Springer")
@@ -66,53 +71,46 @@ public class EBookServiceImpl implements IEBookService {
                         .queryParam("limit", "10")
                         .queryParam("prettyPrint", "false")
                         .queryParam("lng", "en");
-//        SearchResponseDTO responseDTO = restTemplate.getForObject(builder.buildAndExpand().toUri(), SearchResponseDTO.class);
-        String response;
-        try (InputStream inputStream = EBookServiceImpl.class.getResourceAsStream("/response/yoga.json")) {
-            response = IOUtils.toString(inputStream);
-        } catch (IOException e) {
-            response = "{}";
-        }
-        SearchResponseDTO responseDTO = GsonUtils.fromJson(response, SearchResponseDTO.class);
-
-        for (SearchItem searchItem : responseDTO.getRecords()) {
-            if (!searchItem.getIsbns().isEmpty()) {
-                searchItem.setThumbnail(eBookCoverUrl + searchItem.getIsbns().get(0));
+        SearchResponseDTO responseDTO = mock ? buildMockUpSearchResult():
+                restTemplate.getForObject(builder.buildAndExpand().toUri(), SearchResponseDTO.class);
+        if (responseDTO != null) {
+            for (SearchItem searchItem : responseDTO.getRecords()) {
+                if (!searchItem.getIsbns().isEmpty()) {
+                    searchItem.setThumbnail(eBookCoverUrl + searchItem.getIsbns().get(0));
+                }
+                if (searchItem.getAuthorsPrimary() == null) {
+                    searchItem.setAuthorsPrimary(searchItem.getAuthorsSecondary());
+                }
             }
-            if (searchItem.getAuthorsPrimary() == null) {
-                searchItem.setAuthorsPrimary(searchItem.getAuthorsSecondary());
-            }
+            ret = responseDTO.getRecords();
         }
-        return responseDTO.getRecords();
+        return ret;
     }
-
 
     @Override
     public RecordDTO getRemoteBookById(String bookId) {
-        UriComponentsBuilder builder =
-                UriComponentsBuilder.fromUriString(eBookAPIUrl + "/record")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(eBookAPIUrl + "/record")
                         .queryParam("id", bookId)
                         .queryParam("prettyPrint", "false")
                         .queryParam("lng", "en")
                         .queryParam("field[]", "abstract", "authorsPrimary", "authorsSecondary", "id", "isbns",
                                 "title", "urlPdf_str", "publicationDates", "publishers", "downloads");
-        /**
-        RecordResponseDTO responseDTO = restTemplate.getForObject(builder.buildAndExpand().toUri(), RecordResponseDTO.class);
+        RecordResponseDTO responseDTO = mock ? buildMockUpGetBookResult(bookId):
+                restTemplate.getForObject(builder.buildAndExpand().toUri(), RecordResponseDTO.class);
         if (responseDTO != null && responseDTO.getRecords() != null) {
             for (RecordDTO record : responseDTO.getRecords()) {
                 if (record.getDownloads() == null) {
-                    record.setIsPdf(true);
+                    record.setPdf(true);
                     record.setDownloadUrl("");
                 } else {
                     for (DownloadDTO downloadDTO : record.getDownloads()) {
-                        if (downloadDTO.getDesc().equalsIgnoreCase("epub")) {
+                        if ("epub".equalsIgnoreCase(downloadDTO.getDesc())) {
                             record.setDownloadUrl(downloadDTO.getUrl());
-                            record.setIsPdf(false);
+                            record.setPdf(false);
                             break;
                         } else {
                             record.setDownloadUrl(downloadDTO.getUrl());
-                            //todo: reverse
-                            record.setIsPdf(true);
+                            record.setPdf(true);
                         }
                     }
                 }
@@ -123,10 +121,10 @@ public class EBookServiceImpl implements IEBookService {
                     record.setAuthorsPrimary(record.getAuthorsSecondary());
                 }
             }
+            return responseDTO.getRecords().get(0);
+        } else {
+            throw new ReaderException(ResponseBuilder.RetCode.ERROR_400004);
         }
-         **/
-        RecordResponseDTO responseDTO = buildMockupBook(bookId);
-        return responseDTO.getRecords().get(0);
     }
 
     @Override
@@ -143,13 +141,15 @@ public class EBookServiceImpl implements IEBookService {
 
     @Override
     public Page<EBook> getTopDownloadsBooks(BasePageRequest page) {
-        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC, "downloads");
+        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC,
+                "downloads");
         return eBookRepository.findAllByOrderByDownloads(pageable);
     }
 
     @Override
     public Page<EBook> getTopRatedBooks(BasePageRequest page) {
-        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC, "rating");
+        Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC,
+                "rating");
         return eBookRepository.findAllByOrderByRating(pageable);
     }
 
@@ -181,9 +181,7 @@ public class EBookServiceImpl implements IEBookService {
         EBook eBook = eBookRepository.findByBookId(bookId);
         if (eBook == null) {
             eBook = new EBook(bookId);
-            //TODO remove dummy
-            RecordResponseDTO recordResponseDTO = buildMockupBook(bookId);
-            RecordDTO recordDTO = recordResponseDTO.getRecords().get(0);
+            RecordDTO recordDTO = getRemoteBookById(bookId);
             eBook.setBookName(recordDTO.getTitle());
             eBook.setBookCoverURL(recordDTO.getThumbnail());
             eBookRepository.save(eBook);
@@ -192,14 +190,48 @@ public class EBookServiceImpl implements IEBookService {
     }
 
 
-    public RecordResponseDTO buildMockupBook(String bookId) {
-        //todo: remove dummy data
+    private HashMap<String, String> extractCitations(String bookId) {
+        HashMap<String, String> hashMap = new HashMap<>(5);
+        try {
+            String url = "https://ebooks.mpdl.mpg.de/ebooks/Record/" + bookId + "/Cite";
+            Document doc = Jsoup.connect(url).get();
+            Elements citations = doc.select("#content");
+            for (Element element : citations) {
+                for (int i = 0; i < element.children().size(); i++) {
+                    if (element.children().get(i).text().contains("APA")) {
+                        hashMap.put("APA", element.children().get(i + 1).text());
+                    }
+                    if (element.children().get(i).text().contains("Chicago")) {
+                        hashMap.put("Chicago", element.children().get(i + 1).text());
+                    }
+                    if (element.children().get(i).text().contains("MLA")) {
+                        hashMap.put("MLA", element.children().get(i + 1).text());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ReaderException(ResponseBuilder.RetCode.ERROR_400003);
+        }
+        return hashMap;
+    }
+
+    public SearchResponseDTO buildMockUpSearchResult() {
+        String response;
+        try (InputStream inputStream = EBookServiceImpl.class.getResourceAsStream("/response/yoga.json")) {
+            response = IOUtils.toString(inputStream);
+        } catch (IOException e) {
+            response = "{}";
+        }
+        return GsonUtils.fromJson(response, SearchResponseDTO.class);
+    }
+
+    public RecordResponseDTO buildMockUpGetBookResult(String bookId) {
         String jsonFile;
         boolean isPDF = true;
         int downloadIndex = 0;
-        if("EB000900844".equals(bookId)){
+        if ("EB000900844".equals(bookId)) {
             jsonFile = "/response/EB000900844.json";
-        }else {
+        } else {
             jsonFile = "/response/EB000402687.json";
             isPDF = false;
             downloadIndex = 5;
@@ -223,7 +255,7 @@ public class EBookServiceImpl implements IEBookService {
                 "https://keeper.mpdl.mpg.de/f/d14ff8ba4a3e4cda81e2/?dl=1"
         };
         for (RecordDTO record : responseDTO.getRecords()) {
-            record.setIsPdf(isPDF);
+            record.setPdf(isPDF);
             record.setDownloadUrl(urls[downloadIndex]);
             if (!record.getIsbns().isEmpty()) {
                 record.setThumbnail(eBookCoverUrl + record.getIsbns().get(0));
@@ -232,33 +264,8 @@ public class EBookServiceImpl implements IEBookService {
                 record.setAuthorsPrimary(record.getAuthorsSecondary());
             }
         }
-        //todo: remove dummy data
         return responseDTO;
     }
 
-    private HashMap<String, String> extractCitations(String bookId) {
-        HashMap<String, String> hashMap = new HashMap<>(5);
-        try {
-            String url = "https://ebooks.mpdl.mpg.de/ebooks/Record/" + bookId + "/Cite";
-            Document doc = Jsoup.connect(url).get();
-            Elements citations = doc.select("#content");
-            for(Element element: citations){
-                for(int i =0; i< element.children().size(); i++){
-                    if(element.children().get(i).text().contains("APA")){
-                        hashMap.put("APA", element.children().get(i+1).text());
-                    }
-                    if(element.children().get(i).text().contains("Chicago")){
-                        hashMap.put("Chicago", element.children().get(i+1).text());
-                    }
-                    if(element.children().get(i).text().contains("MLA")){
-                        hashMap.put("MLA", element.children().get(i+1).text());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new ReaderException(ResponseBuilder.RetCode.ERROR_400003);
-        }
-        return hashMap;
-    }
 
 }

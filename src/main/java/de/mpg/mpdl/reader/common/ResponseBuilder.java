@@ -21,6 +21,8 @@ public class ResponseBuilder {
 
         ERROR_400003(400003, "no citations are available"),
 
+        ERROR_400004(400004, "no book available by given book id"),
+
         /**
          * Server internal error response with code 50003.
          */
