@@ -93,8 +93,8 @@ public class EBookServiceImpl implements IEBookService {
                         .queryParam("id", bookId)
                         .queryParam("prettyPrint", "false")
                         .queryParam("lng", "en")
-                        .queryParam("field[]", "abstract", "authorsPrimary", "authorsSecondary", "id", "isbns",
-                                "title", "urlPdf_str", "publicationDates", "publishers", "downloads");
+                        .queryParam("field[]", "abstract", "authorsPrimary", "authorsSecondary", "id",
+                                "isbns", "title", "urlPdf_str", "publicationDates", "publishers", "downloads", "url");
         RecordResponseDTO responseDTO = mock ? buildMockUpGetBookResult(bookId):
                 restTemplate.getForObject(builder.buildAndExpand().toUri(), RecordResponseDTO.class);
         if (responseDTO != null && responseDTO.getRecords() != null) {
