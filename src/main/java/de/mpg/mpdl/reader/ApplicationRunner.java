@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
-import java.util.List;
 
 import static org.springframework.ldap.query.LdapQueryBuilder.query;
 
@@ -34,45 +33,26 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
     public void run(ApplicationArguments args) {
         LdapQuery query = query()
                 //.base("dc=mpadmanager,dc=de")
-                .attributes("uid", "cn", "sn", "ou", "dn", "distinguishedName")
-                .where("objectclass").is("inetOrgPerson")
-//                .or("objectclass").is( "organizationalUnit")
-//                .or("objectclass").is( "person")
-//                .or("objectclass").is( "top")
-                ;
-//        List<User> users = ldapTemplate.search(query, new UserAttributesMapper());
-
-        //Get the attribute of user's "memberOf"
-//        List<?> ret = ldapTemplate.search(
-//                query().where("uid").is("mpadadmin@mpdl.mpg.de"),
-//                (AttributesMapper<ArrayList<?>>) attrs -> {
-//                    return Collections.list(attrs.get("memberOf").getAll());
-//                }
-//        );
-
-
-        List<String> result = ldapTemplate.search(query,
-                (AttributesMapper<String>) attrs -> {
-                    return (String) attrs.get("uid").get();
-                });
-        for(String str: result){
-            User user = userRepository.findByEmail(str);
-            if(user == null){
-                user = new User();
-                user.setEmail(str);
-                userRepository.save(user);
-            }
-        }
+                .attributes("uid", "cn", "sn", "ou", "dn")
+                .where("objectclass").is("inetOrgPerson");
+                //.or("objectclass").is( "organizationalUnit")
+                //.or("objectclass").is( "person")
+                //.or("objectclass").is( "top")
+        ldapTemplate.search(query, new UserAttributesMapper());
     }
-
 
 
     private class UserAttributesMapper implements AttributesMapper<User> {
         @Override
         public User mapFromAttributes(Attributes attrs) throws NamingException {
-            User user = new User();
-            user.setEmail((String)attrs.get("uid").get());
-            user.setOu((String)attrs.get("ou").get());
+            String email = (String) attrs.get("uid").get();
+            User user = userRepository.findByEmail(email);
+            if (user == null) {
+                user = new User();
+                user.setEmail(email);
+            }
+            user.setOu((String) attrs.get("ou").get());
+            userRepository.save(user);
             return user;
         }
     }

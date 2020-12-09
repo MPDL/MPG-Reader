@@ -18,4 +18,6 @@ public class ReviewRes extends BaseRS {
 
   private String userName;
 
+  private String organization;
+
 }
