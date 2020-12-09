@@ -13,6 +13,7 @@ import de.mpg.mpdl.reader.dto.SearchItem;
 import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.model.ReadingList;
 import de.mpg.mpdl.reader.model.Review;
+import de.mpg.mpdl.reader.repository.ReviewRepository;
 import de.mpg.mpdl.reader.service.IEBookService;
 import de.mpg.mpdl.reader.service.IReadingListService;
 import de.mpg.mpdl.reader.service.IReviewService;
@@ -41,6 +42,9 @@ public class EBooksController {
 
     @Autowired
     private IReadingListService readingListService;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @GetMapping(value = "/search")
     public BaseResponseDTO<List<SearchItem>> searchEBooks(String keyword) {
@@ -74,6 +78,10 @@ public class EBooksController {
         ReadingList readingList = readingListService.getReadingBySn(sn);
         if(readingList != null && readingList.getBookIds().contains(bookId)) {
             eBookStatisticRes.setInReadingList(true);
+        }
+        Review review = reviewRepository.getByBookIdAndSn(bookId, sn);
+        if(review != null){
+            eBookStatisticRes.setReviewedByMe(true);
         }
         return ResponseBuilder.buildSuccess(eBookStatisticRes);
     }
