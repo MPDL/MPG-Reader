@@ -32,14 +32,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${basic.auth.secret}")
     private String secret;
 
-    public static final String[] PERMIT_PATTERNS = new String[] {
+    public static final String[] STATIC_CONTENTS = new String[] {
             "/mpgReaderDisclaimer.html",
             "/mpgReaderPrivacyPolicy.html",
             "/mpgReaderTerms.html",
             "/img/favicon.ico",
             "/css/header.css",
             "/css/footer.css",
-            "/css/center-status-info-box.css",
+            "/css/center-status-info-box.css"
+    };
+
+    public static final String[] PERMIT_PATTERNS = new String[] {
             "/v2/api-docs",
             "/configuration/ui",
             "/swagger-resources/**",

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static de.mpg.mpdl.reader.config.SecurityConfig.PERMIT_PATTERNS;
+import static de.mpg.mpdl.reader.config.SecurityConfig.STATIC_CONTENTS;
 
 /**
  * @author shidenghui@gmail.com
@@ -34,7 +34,7 @@ public class CustomFilter extends GenericFilterBean {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        for(String str : PERMIT_PATTERNS) {
+        for(String str : STATIC_CONTENTS) {
             if (str.equalsIgnoreCase(request.getRequestURI())) {
                 chain.doFilter(servletRequest, servletResponse);
                 break;
