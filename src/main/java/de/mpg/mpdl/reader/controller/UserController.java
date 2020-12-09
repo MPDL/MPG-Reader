@@ -96,8 +96,9 @@ public class UserController {
      */
     @PostMapping(value = "/review")
     public BaseResponseDTO<ReviewRes> submitReview(@RequestHeader(name = "X-SN") String sn,
+                                                   @RequestHeader(name = "X-Email") String email,
                                                    @Validated @RequestBody BookReviewRQ bookReviewRQ) {
-        Review review = reviewService.submitReview(bookReviewRQ, sn);
+        Review review = reviewService.submitReview(bookReviewRQ, sn, email);
         ReviewRes reviewRes = BeanUtils.convertObject(review, ReviewRes.class);
         return ResponseBuilder.buildSuccess(reviewRes);
     }

@@ -7,7 +7,9 @@ import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.BookReviewRQ;
 import de.mpg.mpdl.reader.exception.ReaderException;
 import de.mpg.mpdl.reader.model.Review;
+import de.mpg.mpdl.reader.model.User;
 import de.mpg.mpdl.reader.repository.ReviewRepository;
+import de.mpg.mpdl.reader.repository.UserRepository;
 import de.mpg.mpdl.reader.service.IEBookService;
 import de.mpg.mpdl.reader.service.IReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +34,12 @@ public class IReviewServiceImpl implements IReviewService {
     @Autowired
     private IEBookService bookService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     @Transactional
-    public Review submitReview(BookReviewRQ bookReviewRQ, String sn) {
+    public Review submitReview(BookReviewRQ bookReviewRQ, String sn, String email) {
         Review review = reviewRepository.getByBookIdAndSn(bookReviewRQ.getBookId(), sn);
         if(review != null){
             throw new ReaderException(ResponseBuilder.RetCode.ERROR_400002);
@@ -49,8 +54,8 @@ public class IReviewServiceImpl implements IReviewService {
         review.setUserName(bookReviewRQ.getName());
         review.setSn(sn);
         if(bookReviewRQ.getShowOrg()) {
-            //ou=Max Planck Digital Library,ou=MPG
-            review.setOrganization("TODO");
+            User user = userRepository.findByEmail(email);
+            review.setOrganization(user.getOu());
         }
         reviewRepository.save(review);
         bookService.updateScore(bookReviewRQ.getBookId(), bookReviewRQ.getRating());

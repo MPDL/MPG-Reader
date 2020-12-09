@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static de.mpg.mpdl.reader.config.SecurityConfig.PERMIT_PATTERNS;
+
 /**
  * @author shidenghui@gmail.com
  * @date 2020/11/23
@@ -32,6 +34,12 @@ public class CustomFilter extends GenericFilterBean {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
+        for(String str : PERMIT_PATTERNS) {
+            if (str.equalsIgnoreCase(request.getRequestURI())) {
+                chain.doFilter(servletRequest, servletResponse);
+                break;
+            }
+        }
         String email = request.getHeader(Constants.HEADER_EMAIL);
         String sn = request.getHeader(Constants.HEADER_SN);
         User user = userRepository.findByEmail(email);
