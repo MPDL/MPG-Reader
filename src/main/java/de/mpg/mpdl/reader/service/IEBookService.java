@@ -16,7 +16,7 @@ import java.util.List;
  * @date 2020/11/9
  */
 public interface IEBookService {
-    List<SearchItem> searchRemoteBooks(String keyword);
+    List<SearchItem> searchRemoteBooks(String keyword, int pageNumber, int pageSize);
 
     RecordDTO getRemoteBookById(String bookId);
 

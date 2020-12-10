@@ -60,15 +60,15 @@ public class EBookServiceImpl implements IEBookService {
 
 
     @Override
-    public List<SearchItem> searchRemoteBooks(String keyword) {
+    public List<SearchItem> searchRemoteBooks(String keyword, int pageNumber, int pageSize) {
         List<SearchItem> ret = new LinkedList<>();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(eBookAPIUrl + "/search")
                         .queryParam("lookfor", keyword)
                         .queryParam("type", "AllFields")
                         .queryParam("filter[]", "~prodcode_str_mv:Springer")
                         .queryParam("sort", "relevance")
-                        .queryParam("page", "1")
-                        .queryParam("limit", "10")
+                        .queryParam("page", pageNumber+"")
+                        .queryParam("limit", pageSize+"")
                         .queryParam("prettyPrint", "false")
                         .queryParam("lng", "en");
         SearchResponseDTO responseDTO = mock ? buildMockUpSearchResult():
