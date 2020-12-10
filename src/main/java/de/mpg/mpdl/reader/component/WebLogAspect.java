@@ -68,7 +68,7 @@ public class WebLogAspect {
         HttpServletRequest request = attributes.getRequest();
         //记录请求信息
         WebLog webLog = new WebLog();
-        Object result;
+        Object result = null;
         try {
             result = joinPoint.proceed();
         } catch (Throwable ex) {
@@ -83,34 +83,34 @@ public class WebLogAspect {
                 webLog.setDescription(ex.getMessage());
                 return ResponseBuilder.buildCommon(ResponseBuilder.RetCode.ERROR_500003);
             }
-        }
-
-        Signature signature = joinPoint.getSignature();
-        MethodSignature methodSignature = (MethodSignature) signature;
-        Method method = methodSignature.getMethod();
-        if (method.isAnnotationPresent(ApiOperation.class)) {
-            ApiOperation apiOperation = method.getAnnotation(ApiOperation.class);
-            webLog.setDescription(apiOperation.value());
-        }
-        long endTime = System.currentTimeMillis();
-        String urlStr = request.getRequestURL().toString();
-        webLog.setBasePath(StrUtil.removeSuffix(urlStr, URLUtil.url(urlStr).getPath()));
-        webLog.setIp(request.getRemoteUser());
-        webLog.setMethod(request.getMethod());
-        webLog.setParameter(getParameter(method, joinPoint.getArgs()));
-        webLog.setResult(result);
-        webLog.setSpendTime((int) (endTime - startTime));
-        webLog.setStartTime(startTime);
-        webLog.setUri(request.getRequestURI());
-        webLog.setUrl(request.getRequestURL().toString());
+        } finally {
+            Signature signature = joinPoint.getSignature();
+            MethodSignature methodSignature = (MethodSignature) signature;
+            Method method = methodSignature.getMethod();
+            if (method.isAnnotationPresent(ApiOperation.class)) {
+                ApiOperation apiOperation = method.getAnnotation(ApiOperation.class);
+                webLog.setDescription(apiOperation.value());
+            }
+            long endTime = System.currentTimeMillis();
+            String urlStr = request.getRequestURL().toString();
+            webLog.setBasePath(StrUtil.removeSuffix(urlStr, URLUtil.url(urlStr).getPath()));
+            webLog.setIp(request.getRemoteUser());
+            webLog.setMethod(request.getMethod());
+            webLog.setParameter(getParameter(method, joinPoint.getArgs()));
+            webLog.setResult(result);
+            webLog.setSpendTime((int) (endTime - startTime));
+            webLog.setStartTime(startTime);
+            webLog.setUri(request.getRequestURI());
+            webLog.setUrl(request.getRequestURL().toString());
 //        LOGGER.info("{}", JSONUtil.parse(webLog));
-        Map<String,Object> logMap = new HashMap<>();
-        logMap.put("url",webLog.getUrl());
-        logMap.put("method",webLog.getMethod());
-        logMap.put("parameter",webLog.getParameter());
-        logMap.put("spendTime",webLog.getSpendTime());
-        logMap.put("description",webLog.getDescription());
-        LOGGER.info(Markers.appendEntries(logMap), JSONUtil.parse(webLog).toString());
+            Map<String, Object> logMap = new HashMap<>();
+            logMap.put("url", webLog.getUrl());
+            logMap.put("method", webLog.getMethod());
+            logMap.put("parameter", webLog.getParameter());
+            logMap.put("spendTime", webLog.getSpendTime());
+            logMap.put("description", webLog.getDescription());
+            LOGGER.info(Markers.appendEntries(logMap), JSONUtil.parse(webLog).toString());
+        }
         return result;
     }
 

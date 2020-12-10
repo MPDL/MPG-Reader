@@ -73,7 +73,7 @@ public class EBookServiceImpl implements IEBookService {
                         .queryParam("lng", "en");
         SearchResponseDTO responseDTO = mock ? buildMockUpSearchResult():
                 restTemplate.getForObject(builder.buildAndExpand().toUri(), SearchResponseDTO.class);
-        if (responseDTO != null) {
+        if (responseDTO != null && responseDTO.getRecords() != null) {
             for (SearchItem searchItem : responseDTO.getRecords()) {
                 if (!searchItem.getIsbns().isEmpty()) {
                     searchItem.setThumbnail(eBookCoverUrl + searchItem.getIsbns().get(0));
