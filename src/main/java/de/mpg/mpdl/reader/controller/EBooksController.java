@@ -46,7 +46,7 @@ public class EBooksController {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    @GetMapping(value = "/search")
+    @PostMapping(value = "/search")
     public BaseResponseDTO<List<SearchItem>> searchEBooks(String keyword,
                                                           @Validated @RequestBody BasePageRequest page) {
         List<SearchItem> searchItems = eBookService.searchRemoteBooks(keyword, page.getPageNumber(), page.getPageSize());
