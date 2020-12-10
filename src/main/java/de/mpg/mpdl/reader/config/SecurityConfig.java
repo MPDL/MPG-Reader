@@ -33,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private String secret;
 
     public static final String[] STATIC_CONTENTS = new String[] {
+            "/",
             "/mpgReaderDisclaimer.html",
             "/mpgReaderPrivacyPolicy.html",
             "/mpgReaderTerms.html",
@@ -64,6 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers(PERMIT_PATTERNS).permitAll()
+                .antMatchers(STATIC_CONTENTS).permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic().authenticationEntryPoint(authenticationEntryPoint)
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
