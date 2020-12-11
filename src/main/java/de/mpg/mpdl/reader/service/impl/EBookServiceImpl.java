@@ -33,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -143,14 +144,14 @@ public class EBookServiceImpl implements IEBookService {
     public Page<EBook> getTopDownloadsBooks(BasePageRequest page) {
         Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC,
                 "downloads");
-        return eBookRepository.findAllByOrderByDownloads(pageable);
+        return eBookRepository.findAllByOrderByDownloadsDesc(pageable);
     }
 
     @Override
     public Page<EBook> getTopRatedBooks(BasePageRequest page) {
         Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC,
                 "rating");
-        return eBookRepository.findAllByOrderByRating(pageable);
+        return eBookRepository.findAllByOrderByRatingDesc(pageable);
     }
 
     @Override
@@ -191,7 +192,7 @@ public class EBookServiceImpl implements IEBookService {
 
 
     private HashMap<String, String> extractCitations(String bookId) {
-        HashMap<String, String> hashMap = new HashMap<>(5);
+        HashMap<String, String> hashMap = new LinkedHashMap<>(5);
         try {
             String url = "https://ebooks.mpdl.mpg.de/ebooks/Record/" + bookId + "/Cite";
             Document doc = Jsoup.connect(url).get();
