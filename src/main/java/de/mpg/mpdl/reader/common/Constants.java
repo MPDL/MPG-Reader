@@ -41,4 +41,13 @@ public class Constants {
          */
         user
     }
+
+    public enum CitationType {
+        /**
+         * enum for citation types
+         */
+        APA,
+        Chicago,
+        MLA,
+    }
 }

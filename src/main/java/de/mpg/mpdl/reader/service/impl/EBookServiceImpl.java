@@ -5,6 +5,7 @@ import de.mpg.mpdl.reader.common.Constants;
 import de.mpg.mpdl.reader.common.GsonUtils;
 import de.mpg.mpdl.reader.common.PageUtils;
 import de.mpg.mpdl.reader.common.ResponseBuilder;
+import de.mpg.mpdl.reader.dto.CitationDTO;
 import de.mpg.mpdl.reader.dto.CitationRS;
 import de.mpg.mpdl.reader.dto.DownloadDTO;
 import de.mpg.mpdl.reader.dto.RecordDTO;
@@ -32,8 +33,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -168,11 +167,11 @@ public class EBookServiceImpl implements IEBookService {
     }
 
     @Override
-    public CitationRS fetchCitation(String bookId) throws IOException {
-        HashMap<String, String> hashMap = extractCitations(bookId);
+    public CitationRS fetchCitation(String bookId) {
+        List<CitationDTO> result = extractCitations(bookId);
         CitationRS citationRS = new CitationRS();
         citationRS.setBookId(bookId);
-        citationRS.setCitationContents(hashMap);
+        citationRS.setCitationContents(result);
         return citationRS;
     }
 
@@ -191,29 +190,32 @@ public class EBookServiceImpl implements IEBookService {
     }
 
 
-    private HashMap<String, String> extractCitations(String bookId) {
-        HashMap<String, String> hashMap = new LinkedHashMap<>(5);
+    private List<CitationDTO> extractCitations(String bookId) {
+        List<CitationDTO> ret = new LinkedList<>();
         try {
             String url = "https://ebooks.mpdl.mpg.de/ebooks/Record/" + bookId + "/Cite";
             Document doc = Jsoup.connect(url).get();
             Elements citations = doc.select("#content");
             for (Element element : citations) {
                 for (int i = 0; i < element.children().size(); i++) {
-                    if (element.children().get(i).text().contains("APA")) {
-                        hashMap.put("APA", element.children().get(i + 1).text());
+                    if (element.children().get(i).text().contains(Constants.CitationType.APA.name())) {
+                        String text = element.children().get(i + 1).text();
+                        ret.add(new CitationDTO(Constants.CitationType.APA, text));
                     }
-                    if (element.children().get(i).text().contains("Chicago")) {
-                        hashMap.put("Chicago", element.children().get(i + 1).text());
+                    if (element.children().get(i).text().contains(Constants.CitationType.Chicago.name())) {
+                        String text = element.children().get(i + 1).text();
+                        ret.add(new CitationDTO(Constants.CitationType.Chicago, text));
                     }
-                    if (element.children().get(i).text().contains("MLA")) {
-                        hashMap.put("MLA", element.children().get(i + 1).text());
+                    if (element.children().get(i).text().contains(Constants.CitationType.MLA.name())) {
+                        String text = element.children().get(i + 1).text();
+                        ret.add(new CitationDTO(Constants.CitationType.MLA, text));
                     }
                 }
             }
         } catch (Exception e) {
             throw new ReaderException(ResponseBuilder.RetCode.ERROR_400003);
         }
-        return hashMap;
+        return ret;
     }
 
     public SearchResponseDTO buildMockUpSearchResult() {
