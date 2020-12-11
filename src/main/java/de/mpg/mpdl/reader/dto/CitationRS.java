@@ -2,7 +2,7 @@ package de.mpg.mpdl.reader.dto;
 
 import lombok.Data;
 
-import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author shidenghui@gmail.com
@@ -11,5 +11,5 @@ import java.util.HashMap;
 @Data
 public class CitationRS {
     private String bookId;
-    private HashMap<String, String> citationContents;
+    private List<CitationDTO> citationContents;
 }
