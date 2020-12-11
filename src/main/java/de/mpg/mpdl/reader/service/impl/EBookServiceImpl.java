@@ -68,7 +68,7 @@ public class EBookServiceImpl implements IEBookService {
                         .queryParam("type", "AllFields")
                         .queryParam("filter[]", "~prodcode_str_mv:Springer")
                         .queryParam("sort", "relevance")
-                        .queryParam("page", pageNumber+"")
+                        .queryParam("page", ++pageNumber+"")
                         .queryParam("limit", pageSize+"")
                         .queryParam("prettyPrint", "false")
                         .queryParam("lng", "en");
