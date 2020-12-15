@@ -16,4 +16,29 @@ public class CommonUtils {
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
+
+    public static boolean needUpdate(String v1, String v2) {
+        //return v2 > v1;
+        String[] current = v1.split("\\.");
+        String[] latest = v2.split("\\.");
+
+        int commonLength = Math.min(current.length, latest.length);
+        int x1, x2;
+        for (int i = 0; i < commonLength; i++) {
+            x1 = Integer.parseInt(current[i]);
+            x2 = Integer.parseInt(latest[i]);
+            if(x1 == x2){
+                continue;
+            }
+            return x2 > x1;
+        }
+
+        String[] extraPart = current.length > latest.length ? current : latest;
+        for (int i = commonLength; i < extraPart.length; i++) {
+            if (Integer.parseInt(extraPart[i]) > 0){
+                return latest.length > current.length;
+            }
+        }
+        return false;
+    }
 }
