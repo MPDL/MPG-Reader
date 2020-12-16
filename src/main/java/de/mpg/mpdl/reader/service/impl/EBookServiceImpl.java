@@ -143,14 +143,14 @@ public class EBookServiceImpl implements IEBookService {
     public Page<EBook> getTopDownloadsBooks(BasePageRequest page) {
         Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC,
                 "downloads");
-        return eBookRepository.findAllByOrderByDownloadsDesc(pageable);
+        return eBookRepository.findAllByDownloadsGreaterThanOrderByDownloadsDesc(0, pageable);
     }
 
     @Override
     public Page<EBook> getTopRatedBooks(BasePageRequest page) {
         Pageable pageable = PageUtils.createPageable(page.getPageNumber(), page.getPageSize(), Sort.Direction.DESC,
                 "rating");
-        return eBookRepository.findAllByOrderByRatingDesc(pageable);
+        return eBookRepository.findAllByRatingGreaterThanOrderByRatingDesc(0.0, pageable);
     }
 
     @Override
