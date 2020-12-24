@@ -51,7 +51,12 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
                 user = new User();
                 user.setEmail(email);
             }
-            user.setOu((String) attrs.get("ou").get());
+
+            if( attrs.get("ou") != null) {
+                user.setOu((String) attrs.get("ou").get());
+            } else {
+                user.setOu("MPG");
+            }
             userRepository.save(user);
             return user;
         }
