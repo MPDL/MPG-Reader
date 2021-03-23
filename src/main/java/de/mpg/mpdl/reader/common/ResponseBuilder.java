@@ -23,6 +23,10 @@ public class ResponseBuilder {
 
         ERROR_400004(400004, "no book available by given book id"),
 
+        ERROR_400005(400005, "no folder available by given folder name"),
+
+        ERROR_400006(400006, "not all bookIds are exists in source folder or bookshelf"),
+
         /**
          * Server internal error response with code 50003.
          */

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -16,6 +17,8 @@ public interface EBookRepository extends BaseRepository<EBook, Long> {
     EBook findByBookId(String BookId);
 
     Page<EBook> findAllByBookIdIn(Set<String> bookIds, Pageable pageable);
+
+    List<EBook> findAllByBookIdIn(Set<String> bookIds);
 
     Page<EBook> findAllByDownloadsGreaterThanOrderByDownloadsDesc(int downloads, Pageable pageable);
 

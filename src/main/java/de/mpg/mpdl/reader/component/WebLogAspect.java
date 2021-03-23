@@ -72,6 +72,7 @@ public class WebLogAspect {
         try {
             result = joinPoint.proceed();
         } catch (Throwable ex) {
+            ex.printStackTrace();
             webLog.setError(true);
             if (hasAnnotation(joinPoint, Transactional.class)) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
