@@ -58,7 +58,7 @@ public class BookShelfController {
     }
 
     @ApiOperation("Get Books in Folder")
-    @PostMapping
+    @PostMapping(value = "/folder/books")
     public BaseResponseDTO<FolderDetailsDto> getBooksInFolder(@RequestHeader(name = "X-SN") String sn, String folderName) {
         FolderDetailsDto folderDetailsDto = folderService.getBooksInFolder(sn, folderName);
         return ResponseBuilder.buildSuccess(folderDetailsDto);
