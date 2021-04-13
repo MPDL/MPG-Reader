@@ -2,6 +2,7 @@ package de.mpg.mpdl.reader.service;
 
 import de.mpg.mpdl.reader.dto.folder.BookshelfDto;
 import de.mpg.mpdl.reader.dto.folder.CreateFolderRQ;
+import de.mpg.mpdl.reader.dto.folder.FolderDetailsDto;
 import de.mpg.mpdl.reader.dto.folder.MoveInBooksRQ;
 import de.mpg.mpdl.reader.model.Bookshelf;
 import de.mpg.mpdl.reader.model.Folder;
@@ -30,4 +31,6 @@ public interface IFolderService {
     Bookshelf getBookshelf(String sn);
 
     BookshelfDto convertBookShelf(Bookshelf bookshelf);
+
+    FolderDetailsDto getBooksInFolder(String sn, String folderName);
 }

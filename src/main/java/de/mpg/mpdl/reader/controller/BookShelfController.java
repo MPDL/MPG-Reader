@@ -6,6 +6,7 @@ import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.folder.BookshelfDto;
 import de.mpg.mpdl.reader.dto.folder.CreateFolderRQ;
 import de.mpg.mpdl.reader.dto.folder.DeleteBooksRQ;
+import de.mpg.mpdl.reader.dto.folder.FolderDetailsDto;
 import de.mpg.mpdl.reader.dto.folder.FolderDto;
 import de.mpg.mpdl.reader.dto.folder.MoveBooksRQ;
 import de.mpg.mpdl.reader.dto.folder.MoveInBooksRQ;
@@ -54,6 +55,13 @@ public class BookShelfController {
         Bookshelf bookshelf = folderService.getBookshelf(sn);
         BookshelfDto bookshelfDto = folderService.convertBookShelf(bookshelf);
         return ResponseBuilder.buildSuccess(bookshelfDto);
+    }
+
+    @ApiOperation("Get Books in Folder")
+    @PostMapping
+    public BaseResponseDTO<FolderDetailsDto> getBooksInFolder(@RequestHeader(name = "X-SN") String sn, String folderName) {
+        FolderDetailsDto folderDetailsDto = folderService.getBooksInFolder(sn, folderName);
+        return ResponseBuilder.buildSuccess(folderDetailsDto);
     }
 
     @ApiOperation("add one downloaded book in bookshelf")

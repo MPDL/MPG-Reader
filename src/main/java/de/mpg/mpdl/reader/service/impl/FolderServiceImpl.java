@@ -4,12 +4,16 @@ import de.mpg.mpdl.reader.common.BeanUtils;
 import de.mpg.mpdl.reader.common.ResponseBuilder;
 import de.mpg.mpdl.reader.dto.folder.BookshelfDto;
 import de.mpg.mpdl.reader.dto.folder.CreateFolderRQ;
+import de.mpg.mpdl.reader.dto.folder.FolderDetailsDto;
 import de.mpg.mpdl.reader.dto.folder.MoveInBooksRQ;
+import de.mpg.mpdl.reader.dto.folder.SimpleBookDto;
 import de.mpg.mpdl.reader.exception.ReaderException;
 import de.mpg.mpdl.reader.model.Bookshelf;
+import de.mpg.mpdl.reader.model.EBook;
 import de.mpg.mpdl.reader.model.Folder;
 import de.mpg.mpdl.reader.repository.BookshelfRepository;
 import de.mpg.mpdl.reader.repository.FolderRepository;
+import de.mpg.mpdl.reader.service.IEBookService;
 import de.mpg.mpdl.reader.service.IFolderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,9 @@ public class FolderServiceImpl implements IFolderService {
 
     @Autowired
     private FolderRepository folderRepository;
+
+    @Autowired
+    private IEBookService eBookService;
 
     @Autowired
     private BookshelfRepository bookshelfRepository;
@@ -78,7 +85,7 @@ public class FolderServiceImpl implements IFolderService {
     public void moveOut(Set<String> bookIds, Folder srcFolder) {
         if (srcFolder.getBookIds().containsAll(bookIds)) {
             srcFolder.getBookIds().removeAll(bookIds);
-            if(srcFolder.getBookIds().isEmpty()){
+            if (srcFolder.getBookIds().isEmpty()) {
                 srcFolder.setIsEmpty(true);
             }
             folderRepository.save(srcFolder);
@@ -116,15 +123,34 @@ public class FolderServiceImpl implements IFolderService {
     }
 
     @Override
-    public BookshelfDto convertBookShelf(Bookshelf bookshelf){
+    public BookshelfDto convertBookShelf(Bookshelf bookshelf) {
         BookshelfDto bookshelfDto = BeanUtils.convertObject(bookshelf, BookshelfDto.class);
         List<String> folderNames = new LinkedList<>();
-        for(Long folderId : bookshelf.getFolderIds()){
+        for (Long folderId : bookshelf.getFolderIds()) {
             Optional<Folder> folder = folderRepository.findById(folderId);
             folder.ifPresent(theFolder -> folderNames.add(theFolder.getFolderName()));
         }
         bookshelfDto.setFolderNames(folderNames);
         return bookshelfDto;
+    }
+
+    @Override
+    @Transactional
+    public FolderDetailsDto getBooksInFolder(String sn, String folderName) {
+        Folder folder = folderRepository.findByFolderNameAndSn(folderName, sn);
+        if (folder == null) {
+            throw new ReaderException(ResponseBuilder.RetCode.ERROR_400005);
+        }
+        List<SimpleBookDto> books = new LinkedList<>();
+        for (String bookId : folder.getBookIds()) {
+            EBook eBook = eBookService.getByBookId(bookId);
+            books.add(BeanUtils.convertObject(eBook, SimpleBookDto.class));
+        }
+        FolderDetailsDto folderDetailsDto = new FolderDetailsDto();
+        folderDetailsDto.setSn(sn);
+        folderDetailsDto.setFolderName(folderName);
+        folderDetailsDto.setBooks(books);
+        return folderDetailsDto;
     }
 
 }
